@@ -72,19 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\SOFT355 Model Loader\lib;C:\Users\Sam\source\repos\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\scollis\Desktop\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\SOFT355 Model Loader\lib;C:\Users\Sam\source\repos\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\scollis\Desktop\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\SOFT355 Model Loader\lib;C:\Users\Sam\source\repos\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\scollis\Desktop\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\SOFT355 Model Loader\lib;C:\Users\Sam\source\repos\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\scollis\Desktop\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
