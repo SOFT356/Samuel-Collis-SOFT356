@@ -49,14 +49,12 @@ public:
 		GLuint program = LoadShaders(shaders);
 		glUseProgram(program);
 
-		GLuint vertexBuffer;
-		glGenBuffers(1, &vertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glGenBuffers(NumBuffers, Buffers);
 
-		GLuint textureBuffer;
-		glGenBuffers(1, &textureBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, Buffers[Triangles]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, Buffers[Tex]);
 		glBufferData(GL_ARRAY_BUFFER, textures.size() * sizeof(glm::vec2), &textures[0], GL_STATIC_DRAW);
 
 		// creating the model matrix
@@ -87,14 +85,14 @@ public:
 	}
 
 	void draw() {
-		
+	
 		static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		glClearBufferfv(GL_COLOR, 0, black);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glFrontFace(GL_CW); glCullFace(GL_BACK);
+		glFrontFace(GL_CW); 
+		glCullFace(GL_BACK);
 		glEnable(GL_CULL_FACE);
-		glBindVertexArray(VAOs[Triangles]);
-		glBindTexture(GL_TEXTURE_2D, texture1);
+		glBindVertexArray(VAOs[Triangles]); 
 		glDrawElements(GL_TRIANGLES, vertices.size(), GL_UNSIGNED_INT, 0);
 	}
 

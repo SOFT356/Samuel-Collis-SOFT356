@@ -17,7 +17,7 @@ int main()
 
 	glfwInit();
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Textured Cube", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(800, 600, input.c_str(), NULL, NULL);
 
 	glfwMakeContextCurrent(window);
 	glewInit();
