@@ -89,11 +89,12 @@ public:
 	void draw() {
 		
 		static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
 		glClearBufferfv(GL_COLOR, 0, black);
 		glClear(GL_COLOR_BUFFER_BIT);
-		
+		glFrontFace(GL_CW); glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
 		glBindVertexArray(VAOs[Triangles]);
+		glBindTexture(GL_TEXTURE_2D, texture1);
 		glDrawElements(GL_TRIANGLES, vertices.size(), GL_UNSIGNED_INT, 0);
 	}
 

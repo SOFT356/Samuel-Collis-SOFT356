@@ -1,8 +1,2 @@
 ﻿  Model.cpp
-  ModelLoader.cpp
-E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(89,20): warning C4018: '<': signed/unsigned mismatch
-E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(95,20): warning C4018: '<': signed/unsigned mismatch
-  SOFT355 Model Loader.cpp
-  Generating Code...
-E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(101,20): warning C4018: '<': signed/unsigned mismatch
   SOFT355 Model Loader.vcxproj -> E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\Debug\SOFT355 Model Loader.exe
