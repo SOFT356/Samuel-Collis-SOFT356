@@ -15,7 +15,29 @@ int main()
     std::cout << "Please input the file location of the object\n";
 	std::string input;
 	std::cin >> input;
-	loadFromFile(input);
+	Model model = loadFromFile(input);
+
+	glfwInit();
+
+	GLFWwindow* window = glfwCreateWindow(800, 600, "Textured Cube", NULL, NULL);
+
+	glfwMakeContextCurrent(window);
+	glewInit();
+
+	model.init();
+
+	while (!glfwWindowShouldClose(window))
+	{
+		model.draw();
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	glfwDestroyWindow(window);
+
+	glfwTerminate();
+
+
 	
 }
 

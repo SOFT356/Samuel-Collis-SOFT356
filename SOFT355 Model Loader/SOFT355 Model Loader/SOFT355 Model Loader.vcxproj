@@ -72,19 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\scollis\Desktop\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\scollis\Desktop\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\scollis\Desktop\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\scollis\Desktop\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="SOFT355 Model Loader.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
@@ -166,6 +167,7 @@
   <ItemGroup>
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
+    <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
