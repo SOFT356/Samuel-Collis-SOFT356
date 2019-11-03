@@ -25,8 +25,10 @@ public:
 	vector<glm::vec2> textures;
 	vector<glm::vec3> normals;
 
-	enum VAO_IDs { Triangles, Indices, Colours, Tex, NumVAOs = 1 };
-	enum Buffer_IDs { ArrayBuffer, NumBuffers = 4 };
+	vector<GLuint> indices;
+
+	enum VAO_IDs { Triangles, Indices, Tex, NumVAOs = 1 };
+	enum Buffer_IDs { ArrayBuffer, NumBuffers = 3 };
 	enum Attrib_IDs { vPosition = 0, cPosition = 1, tPosition = 2 };
 
 	#define BUFFER_OFFSET(a) ((void*)(a))
@@ -54,8 +56,11 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, Buffers[Triangles]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[Indices]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+
 		glBindBuffer(GL_ARRAY_BUFFER, Buffers[Tex]);
-		glBufferData(GL_ARRAY_BUFFER, textures.size() * sizeof(glm::vec2), &textures[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(textures), &textures[0], GL_STATIC_DRAW);
 
 		// creating the model matrix
 		glm::mat4 model = glm::mat4(1.0f);
@@ -75,17 +80,12 @@ public:
 		// Adding all matrices up to create combined matrix
 		glm::mat4 mvp = projection * view * model;
 
-		//adding the Uniform to the shader
-		int mvpLoc = glGetUniformLocation(program, "mvp");
-		glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
 		glEnableVertexAttribArray(vPosition);
 		glEnableVertexAttribArray(cPosition);
 		glEnableVertexAttribArray(tPosition);
 	}
 
 	void draw() {
-	
 		static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		glClearBufferfv(GL_COLOR, 0, black);
 		glClear(GL_COLOR_BUFFER_BIT);

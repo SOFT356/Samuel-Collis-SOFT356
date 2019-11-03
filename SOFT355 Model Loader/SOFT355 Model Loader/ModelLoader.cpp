@@ -14,7 +14,7 @@ Model loadFromObj(std::string file) {
 	rfile.open(file);
 	std::string line;
 
-	std::vector< unsigned int > vertexIndices, textIndices, normalIndices;
+	std::vector< unsigned int > vertexIndices;
 	std::vector< glm::vec3 > temp_vertices;
 	std::vector< glm::vec2 > temp_textures;
 	std::vector< glm::vec3 > temp_normals;
@@ -63,46 +63,16 @@ Model loadFromObj(std::string file) {
 				vertexIndices.push_back(vertexIndex[2]);
 				vertexIndices.push_back(vertexIndex[3]);
 
-				textIndices.push_back(uvIndex[0]);
-				textIndices.push_back(uvIndex[1]);
-				textIndices.push_back(uvIndex[2]);
-
-				textIndices.push_back(uvIndex[1]);
-				textIndices.push_back(uvIndex[2]);
-				textIndices.push_back(uvIndex[3]);
-
-				normalIndices.push_back(normalIndex[0]);
-				normalIndices.push_back(normalIndex[1]);
-				normalIndices.push_back(normalIndex[2]);
-
-				normalIndices.push_back(normalIndex[1]);
-				normalIndices.push_back(normalIndex[2]);
-				normalIndices.push_back(normalIndex[3]);
-
 			}
 
 			std::cout << line << std::endl;
 		}
 	}
 
-	//Indexing the data from the obj file
-	for (int i = 0; i < vertexIndices.size(); i++) {
-		int verInd = vertexIndices[i];
-		glm::vec3 vertex = temp_vertices[verInd - 1];
-		model.vertices.push_back(vertex);
-	}
-
-	for (int i = 0; i < textIndices.size(); i++) {
-		int textInd = textIndices[i];
-		glm::vec2 text = temp_textures[textInd - 1];
-		model.textures.push_back(text);
-	}
-
-	for (int i = 0; i < normalIndices.size(); i++) {
-		int normalInd = normalIndices[i];
-		glm::vec3 normal = temp_normals[normalInd - 1];
-		model.normals.push_back(normal);
-	}
+	model.vertices = temp_vertices;
+	model.textures = temp_textures;
+	model.normals = temp_normals;
+	model.indices = vertexIndices;
 
 	return model;
 }
