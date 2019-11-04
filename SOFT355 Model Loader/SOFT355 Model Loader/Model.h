@@ -24,7 +24,7 @@ public:
 
 	vector<GLuint> indices;
 
-	enum VAO_IDs { Triangles, Indices, Colours, Tex, NumVAOs = 1 };
+	enum VAO_IDs { Vertices, Indices, Colours, Tex, NumVAOs = 1 };
 	enum Buffer_IDs { ArrayBuffer, NumBuffers = 4 };
 	enum Attrib_IDs { vPosition = 0, cPosition = 1, tPosition = 2 };
 

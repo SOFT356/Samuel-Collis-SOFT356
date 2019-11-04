@@ -21,7 +21,7 @@ using std::vector;
 void Model::init() {
 
 	glGenVertexArrays(NumVAOs, VAOs);
-	glBindVertexArray(VAOs[Triangles]);
+	glBindVertexArray(VAOs[Vertices]);
 
 	ShaderInfo  shaders[] =
 	{
@@ -35,7 +35,7 @@ void Model::init() {
 
 	glGenBuffers(NumBuffers, Buffers);
 
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Triangles]);
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Vertices]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[Indices]);
@@ -56,9 +56,7 @@ void Model::init() {
 	glVertexAttribPointer(tPosition, 2, GL_FLOAT,
 		GL_FALSE, 0, BUFFER_OFFSET(0));
 
-	// load and create a texture 
-	// -------------------------
-
+	
 	// texture 1
 	// ---------
 	glGenTextures(1, &texture1);
@@ -72,7 +70,7 @@ void Model::init() {
 	// load image, create texture and generate mipmaps
 	GLint width, height, nrChannels;
 	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-	unsigned char* data = stbi_load("media/awesomeface.png", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("media/texture.png", &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -124,9 +122,10 @@ void Model::init() {
 		glCullFace(GL_BACK);
 		glEnable(GL_CULL_FACE);
 
-		glBindVertexArray(VAOs[Triangles]);
+		glBindVertexArray(VAOs[Vertices]);
 		glBindTexture(GL_TEXTURE_2D, texture1);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, vertices.size(), GL_UNSIGNED_INT, 0);
+
 	}
 
 	void Model::translate() {
