@@ -10,10 +10,23 @@
 
 int main()
 {
-	std::cout << "Please input the file location of the object\n";
 	std::string input;
-	std::cin >> input;
-	Model model = loadFromFile(input);
+	Model model;
+
+	do {
+		std::cout << "Please input the file location of the object\n";
+		std::cin >> input;
+		model = loadFromFile(input);
+
+		if (!model.createdSuccessfully) {
+			std::cout << "There was an issue loading your file, please try another" << std::endl;
+		}
+
+	} while (!model.createdSuccessfully);
+
+	
+
+	
 
 	glfwInit();
 

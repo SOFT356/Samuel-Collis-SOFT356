@@ -50,6 +50,8 @@ Model loadFromObj(std::string file) {
 
 				if (matches != 12 && matches != 9) {
 					std::cout << "There was a problem parsing the f data";
+					model.createdSuccessfully = false;
+					return model;
 				}
 
 				//so triangle 1
@@ -127,6 +129,8 @@ Model loadFromObj(std::string file) {
 	model.textureIndices = textureIndices;
 	model.normalIndices = normalIndices;
 
+	rfile.close();
+
 	//Performing a swap with an empty vector will free up the memory used
 	vector<glm::vec3>().swap(temp_vertices);
 	vector<glm::vec3>().swap(temp_normals);
@@ -135,11 +139,17 @@ Model loadFromObj(std::string file) {
 	vector<GLuint>().swap(textureIndices);
 	vector<GLuint>().swap(normalIndices);
 
+	model.createdSuccessfully = true;
+
 	return model;
 }
 
 
 Model loadFromFile(std::string file) {
+
+	if (file.length() < 4) {
+		return Model();
+	}
 
 	std::string fileType = file.substr(file.length() - 4, file.length());
 

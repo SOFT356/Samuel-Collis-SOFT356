@@ -26,13 +26,7 @@ public:
 	vector<GLuint> textureIndices;
 	vector<GLuint> normalIndices;
 
-	enum VAO_IDs { Vertices, Indices, Colours, Tex, NumVAOs = 1 };
-	enum Buffer_IDs { ArrayBuffer, NumBuffers = 4 };
-	enum Attrib_IDs { vPosition = 0, cPosition = 1, tPosition = 2 };
-
-	GLuint  VAOs[NumVAOs];
-	GLuint  Buffers[NumBuffers];
-	GLuint texture1;
+	bool createdSuccessfully = false;
 
 	void init();
 
