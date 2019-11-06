@@ -16,12 +16,20 @@
 
 #define BUFFER_OFFSET(a) ((void*)(a))
 
-using std::vector;
+enum VAO_IDs { ModelVAO, NumVAOs = 1 };
+enum Buffer_IDs { Vertices, Normals, Textures, VertexIndices, NumBuffers = 4 };
+
+GLuint  VAOs[NumVAOs];
+GLuint  Buffers[NumBuffers];
+GLuint texture1;
+
+GLuint shader;
+
 
 void Model::init() {
 
 	glGenVertexArrays(NumVAOs, VAOs);
-	glBindVertexArray(VAOs[Vertices]);
+	glBindVertexArray(VAOs[ModelVAO]);
 
 	ShaderInfo  shaders[] =
 	{
@@ -30,101 +38,160 @@ void Model::init() {
 		{ GL_NONE, NULL }
 	};
 
-	GLuint program = LoadShaders(shaders);
-	glUseProgram(program);
+	shader = LoadShaders(shaders);
+	glUseProgram(shader);
+	
+	//
+	// configuring lighting
+	//
+
+	// ambient light
+	glm::vec4 ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+	//adding the Uniform to the shader
+	GLuint aLoc = glGetUniformLocation(shader, "ambient");
+	glUniform4fv(aLoc, 1, glm::value_ptr(ambient));
+
+	// light object
+	glm::vec3 lightPos = glm::vec3(100.0f, 25.0f, 100.0f);
+	GLuint dLightPosLoc = glGetUniformLocation(shader, "lightPos");
+	glUniform3fv(dLightPosLoc, 1, glm::value_ptr(lightPos));
+
+
+	// diffuse light
+	glm::vec3 diffuseLight = glm::vec3(0.5f, 0.2f, 0.7f);
+	GLuint dLightLoc = glGetUniformLocation(shader, "dLight");
+	glUniform3fv(dLightLoc, 1, glm::value_ptr(diffuseLight));
+
+	// specular light
+	glm::vec3 specularLight = glm::vec3(0.7f);
+	GLfloat shininess = 256; //128 is max value
+	GLuint sLightLoc = glGetUniformLocation(shader, "sLight");
+	GLuint sShineLoc = glGetUniformLocation(shader, "sShine");
+	glUniform3fv(sLightLoc, 1, glm::value_ptr(specularLight));
+	glUniform1fv(sShineLoc, 1, &shininess);
 
 	glGenBuffers(NumBuffers, Buffers);
 
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Vertices]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[Indices]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[VertexIndices]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(GLuint), vertexIndices.data(), GL_STATIC_DRAW);
 
-
-
-	glVertexAttribPointer(vPosition, 3, GL_FLOAT,
+	glVertexAttribPointer(Vertices, 3, GL_FLOAT,
 		GL_FALSE, 0, BUFFER_OFFSET(0));
 
+	//Colour Binding
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Normals]);
+	glBufferStorage(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), normals.data(), 0);
 
-	glVertexAttribPointer(cPosition, 4, GL_FLOAT,
+	glVertexAttribPointer(Normals, 3, GL_FLOAT,
 		GL_FALSE, 0, BUFFER_OFFSET(0));
 
 	//Texture Binding
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Tex]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(textures), &textures, GL_STATIC_DRAW);
-	glVertexAttribPointer(tPosition, 2, GL_FLOAT,
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Textures]);
+	glBufferData(GL_ARRAY_BUFFER, textures.size() * sizeof(glm::vec3), textures.data(), GL_STATIC_DRAW);
+
+	glVertexAttribPointer(Textures, 2, GL_FLOAT,
 		GL_FALSE, 0, BUFFER_OFFSET(0));
 
-	
+
+	// load and create a texture 
+	// -------------------------
+
 	// texture 1
 	// ---------
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
+	//glGenTextures(1, &texture1);
+	//glBindTexture(GL_TEXTURE_2D, texture1);
 	// set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load image, create texture and generate mipmaps
-	GLint width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-	unsigned char* data = stbi_load("media/texture.png", &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
+	//GLint width, height, nrChannels;
+	//stbi_set_flip_vertically_on_load(false); // tell stb_image.h to flip loaded texture's on the y-axis.
+	//unsigned char* data = stbi_load("media/texture.png", &width, &height, &nrChannels, 0);
+	//if (data)
+	//{
+	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	//	glGenerateMipmap(GL_TEXTURE_2D);
+	//}
+	//else
+	//{
+	//	std::cout << "Failed to load texture" << std::endl;
+	//}
+	//stbi_image_free(data);
 
-
-	glUniform1i(glGetUniformLocation(program, "texture1"), 0);
+	//glUniform1i(glGetUniformLocation(shader, "texture1"), 0);
 
 
 	// creating the model matrix
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-	model = glm::rotate(model, glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f));
+	glm::mat4 modelMat = glm::mat4(1.0f);
+	modelMat = glm::scale(modelMat, glm::vec3(2.0f, 2.0f, 2.0f));
+
 
 	// creating the view matrix
 	glm::mat4 view = glm::mat4(1.0f);
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.0f));
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
 
 	// creating the projection matrix
 	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3, 0.1f, 20.0f);
 
 	// Adding all matrices up to create combined matrix
-	glm::mat4 mvp = projection * view * model;
-
+	glm::mat4 mv = view * modelMat;
 
 	//adding the Uniform to the shader
-	int mvpLoc = glGetUniformLocation(program, "mvp");
-	glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+	int mvLoc = glGetUniformLocation(shader, "mv_matrix");
+	glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mv));
+	//adding the Uniform to the shader
+	int pLoc = glGetUniformLocation(shader, "p_matrix");
+	glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-	glEnableVertexAttribArray(vPosition);
-	glEnableVertexAttribArray(cPosition);
-	glEnableVertexAttribArray(tPosition);
+	glEnableVertexAttribArray(Vertices);
+	glEnableVertexAttribArray(Textures);
+	glEnableVertexAttribArray(Normals);
 	}
 
-	void Model::draw() {
+	void Model::draw(GLfloat xdelta, GLfloat ydelta, GLfloat zdelta, GLfloat scale) {
 		static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-		glClearBufferfv(GL_COLOR, 0, black);
+		glClearBufferfv(GL_COLOR, 1, black);
+		glClearColor(0.2f, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
+
 		// bind textures on corresponding texture units
 		glFrontFace(GL_CW);
 		glCullFace(GL_BACK);
 		glEnable(GL_CULL_FACE);
+		// creating the model matrix
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::scale(model, glm::vec3(scale, scale, scale));
+		model = glm::rotate(model, glm::radians(xdelta), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(ydelta), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(zdelta), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		glBindVertexArray(VAOs[Vertices]);
+		// creating the view matrix
+		glm::mat4 view = glm::mat4(1.0f);
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
+
+		// creating the projection matrix
+		glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3, 0.1f, 20.0f);
+
+		// Adding all matrices up to create combined matrix
+		glm::mat4 mv = view * model;
+
+		//adding the Uniform to the shader
+		int mvLoc = glGetUniformLocation(shader, "mv_matrix");
+		glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mv));
+		//adding the Uniform to the shader
+		int pLoc = glGetUniformLocation(shader, "p_matrix");
+		glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+		glBindVertexArray(VAOs[ModelVAO]);
 		glBindTexture(GL_TEXTURE_2D, texture1);
-		glDrawElements(GL_TRIANGLES, vertices.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, vertexIndices.size(), GL_UNSIGNED_INT, 0);
 
 	}
 

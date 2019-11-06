@@ -10,7 +10,7 @@
 
 int main()
 {
-    std::cout << "Please input the file location of the object\n";
+	std::cout << "Please input the file location of the object\n";
 	std::string input;
 	std::cin >> input;
 	Model model = loadFromFile(input);
@@ -23,25 +23,54 @@ int main()
 	glewInit();
 
 	model.init();
+	GLfloat xdelta = 0.0f;
+	GLfloat ydelta = 0.0f;
+	GLfloat zdelta = 0.0f;
+	GLfloat scale = 1.0f;
 
-	while (!glfwWindowShouldClose(window))
-	{
-		model.draw();
+	do {
+		// uncomment to draw only wireframe 
+		 //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		model.draw(xdelta, ydelta, zdelta, scale);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-	}
+
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+			ydelta += 1.0f;
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+			ydelta -= 1.0f;
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			xdelta -= 1.0f;
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+			xdelta -= -1.0f;
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) {
+			scale += 0.005f;
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
+			scale += -0.005f;
+		}
+
+		if (scale < 0) {
+			scale = 0;
+		}
+
+
+	} // Check if the ESC key was pressed or the window was closed
+	while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
+		glfwWindowShouldClose(window) == 0);
+
 
 	glfwDestroyWindow(window);
+
 	glfwTerminate();
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

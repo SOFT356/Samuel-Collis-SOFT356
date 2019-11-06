@@ -22,7 +22,9 @@ public:
 	vector<glm::vec2> textures;
 	vector<glm::vec3> normals;
 
-	vector<GLuint> indices;
+	vector<GLuint> vertexIndices;
+	vector<GLuint> textureIndices;
+	vector<GLuint> normalIndices;
 
 	enum VAO_IDs { Vertices, Indices, Colours, Tex, NumVAOs = 1 };
 	enum Buffer_IDs { ArrayBuffer, NumBuffers = 4 };
@@ -34,7 +36,7 @@ public:
 
 	void init();
 
-	void draw();
+	void draw(GLfloat xdelta, GLfloat ydelta, GLfloat zdelta, GLfloat scale);
 
 	void translate();
 
