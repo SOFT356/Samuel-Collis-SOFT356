@@ -1,2 +1,4 @@
-﻿  ModelLoader.cpp
-  SOFT355 Model Loader.vcxproj -> C:\Users\scollis\Desktop\Samuel-Collis-SOFT356\SOFT355 Model Loader\x64\Debug\SOFT355 Model Loader.exe
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(452,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (SOFT355 Model Loader.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  SOFT356 Model Loader.cpp
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\SOFT356 Model Loader.cpp(115,22): warning C4305: '=': truncation from 'double' to 'GLfloat'
+  SOFT355 Model Loader.vcxproj -> E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\x64\Debug\SOFT356 Model Loader.exe

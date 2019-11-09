@@ -28,11 +28,13 @@ public:
 	//the size of the object
 	GLfloat scaleFactor;
 
+	bool hasTexture = false;
+	std::string textureLocation;
+
 	bool createdSuccessfully = false;
-	
 
 	//Initialise
-	void init();
+	void init(GLuint program);
 
 	//Draw model
 	void draw();
@@ -53,6 +55,12 @@ public:
 	
 	//Print the variables to the console
 	void debug();
+	
+private: 
+
+	void applyLighting();
+
+	void bindTexture();
 
 };
 

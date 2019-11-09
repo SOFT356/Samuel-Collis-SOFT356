@@ -20,7 +20,7 @@ Model loadFromObj(std::string file) {
 	std::string line;
 
 	//Create out variables to hold the parsed data untill the end
-	std::vector<GLuint> vertexIndices, textureIndices, normalIndices;;
+	std::vector<GLuint> vertexIndices, textureIndices, normalIndices;
 	std::vector<glm::vec3> temp_vertices;
 	std::vector<glm::vec2> temp_textures;
 	std::vector<glm::vec3> temp_normals;
@@ -43,7 +43,8 @@ Model loadFromObj(std::string file) {
 			else if (lineStart._Equal("vt")) {
 				glm::vec2 texture;
 				sscanf_s(line.c_str(), "vt %f %f\n", &texture.x, &texture.y);
-				texture.g = 1;
+				texture.x = 1 - texture.x; 
+				texture.y = 1 - texture.y;
 				temp_textures.push_back(texture);
 			}
 			//vn indicates a vertex normal
@@ -104,6 +105,7 @@ Model loadFromObj(std::string file) {
 		model.vertices.push_back(vertex);
 	}
 
+
 	for (int i = 0; i < textureIndices.size(); i++) {
 		//same as above but shorthand
 		model.textures.push_back(temp_textures[textureIndices[i]]);
@@ -122,6 +124,31 @@ Model loadFromObj(std::string file) {
 		model.vertexIndices.push_back(i + 2);
 		model.vertexIndices.push_back(i + 3);
 		model.vertexIndices.push_back(i + 0);
+	}
+
+	rfile.close();
+
+	//Look for a material file
+	file = file.substr(0, file.length() - 3) + "mtl";
+
+	rfile.open(file);
+
+	//if the file is not open then there is no material file for the object
+	if (rfile.is_open()) {
+		while (std::getline(rfile, line)) {
+			lineStart = line.substr(0, 6);
+			if (lineStart._Equal("map_Kd")) {
+				model.textureLocation = line.substr(line.find_first_of(" ") + 1, line.length());
+				//we want to store the texture location in the same format that the user inputted the info in
+				//this means that we will use the same file delimiter. This is done as windows and unix systems
+				//use a different directional slash to indicate folder structure
+				char fileDelimiter = file.find("\\") != std::string::npos ? '\\' : '/';
+				model.textureLocation = file.substr(0, file.find_last_of(fileDelimiter) + 1) + model.textureLocation;
+				std::cout << model.textureLocation << std::endl;
+				model.hasTexture = true;
+			}
+		}
+
 	}
 
 	rfile.close();

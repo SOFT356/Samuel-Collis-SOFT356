@@ -15,54 +15,23 @@
 #define BUFFER_OFFSET(a) ((void*)(a))
 
 enum VAO_IDs { ModelVAO, NumVAOs = 1 };
-enum Buffer_IDs { Vertices, Normals, Textures, VertexIndices, NormalIndices, TextureIndices, NumBuffers = 6 };
+enum Buffer_IDs { Vertices, Normals, Textures, VertexIndices, NumBuffers = 5 };
 
 GLuint VAOs[NumVAOs];
 GLuint Buffers[NumBuffers];
-GLuint textureId;
+GLuint texture1;
 
-GLuint shader;
+GLuint usedProgram;
 
-void Model::init() {
+void Model::init(GLuint program) {
+
+	usedProgram = program;
+	glUseProgram(usedProgram);
 
 	glGenVertexArrays(NumVAOs, VAOs);
-	glBindVertexArray(VAOs[ModelVAO]);
-
-	ShaderInfo  shaders[] =
-	{
-		{ GL_VERTEX_SHADER, "media/triangles.vert" },
-		{ GL_FRAGMENT_SHADER, "media/triangles.frag" },
-		{ GL_NONE, NULL }
-	};
-
-	shader = LoadShaders(shaders);
-	glUseProgram(shader);
-	
-	//Create Ambient lighting and add to shader
-	glm::vec4 ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-	GLuint aLoc = glGetUniformLocation(shader, "ambient");
-	glUniform4fv(aLoc, 1, glm::value_ptr(ambient));
-
-	//Create the light object and apply to shader
-	glm::vec3 lightPos = glm::vec3(100.0f, 25.0f, 100.0f);
-	GLuint dLightPosLoc = glGetUniformLocation(shader, "lightPos");
-	glUniform3fv(dLightPosLoc, 1, glm::value_ptr(lightPos));
-
-	//Create light diffusion and add to shader
-	glm::vec3 diffuseLight = glm::vec3(0.5f, 0.2f, 0.7f);
-	GLuint dLightLoc = glGetUniformLocation(shader, "dLight");
-	glUniform3fv(dLightLoc, 1, glm::value_ptr(diffuseLight));
-
-	//Create specular light and add to shader
-	glm::vec3 specularLight = glm::vec3(0.7f);
-	GLfloat shininess = 256; //128 is max value
-	GLuint sLightLoc = glGetUniformLocation(shader, "sLight");
-	GLuint sShineLoc = glGetUniformLocation(shader, "sShine");
-	glUniform3fv(sLightLoc, 1, glm::value_ptr(specularLight));
-	glUniform1fv(sShineLoc, 1, &shininess);
-
-	//initiate buffsers
 	glGenBuffers(NumBuffers, Buffers);
+
+	glBindVertexArray(VAOs[ModelVAO]);
 
 	//Populate vertice and it's indices to the buffers
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Vertices]);
@@ -73,6 +42,7 @@ void Model::init() {
 
 	glVertexAttribPointer(Vertices, 3, GL_FLOAT,
 		GL_FALSE, 0, BUFFER_OFFSET(0));
+
 
 	//Do the same for normals
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Normals]);
@@ -88,34 +58,16 @@ void Model::init() {
 	glVertexAttribPointer(Textures, 2, GL_FLOAT,
 		GL_FALSE, 0, BUFFER_OFFSET(0));
 
-	glGenTextures(1, &textureId);
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	// set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load image, create texture and generate mipmaps
-	GLint width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(false); // tell stb_image.h to flip loaded texture's on the y-axis.
-	unsigned char* data = stbi_load("media/Texture.png", &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
+	if (hasTexture) {
+		bindTexture();
 	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
-
-	glUniform1i(glGetUniformLocation(shader, "texture1"), 0);
+	
+	applyLighting();
 
 	glEnableVertexAttribArray(Vertices);
 	glEnableVertexAttribArray(Textures);
 	glEnableVertexAttribArray(Normals);
+
 	}
 
 	void Model::draw() {
@@ -125,13 +77,13 @@ void Model::init() {
 		glClearBufferfv(GL_COLOR, 0, black);
 
 		//Set the background to a dark red
-		glClearColor(0.6f, 0, 0, 0);
+		glClearColor(0.2f, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Only render faces we can see
-		
+		glFrontFace(GL_CW);
+		glCullFace(GL_BACK);
 		glEnable(GL_CULL_FACE);
-
 
 		//Create a model matrix
 		glm::mat4 model = glm::mat4(1.0f);
@@ -154,14 +106,17 @@ void Model::init() {
 		glm::mat4 mv = view * model;
 
 		//adding the Uniform to the shader
-		int mvLoc = glGetUniformLocation(shader, "mv_matrix");
+		int mvLoc = glGetUniformLocation(usedProgram, "mv_matrix");
 		glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mv));
 		//adding the Uniform to the shader
-		int pLoc = glGetUniformLocation(shader, "p_matrix");
+		int pLoc = glGetUniformLocation(usedProgram, "p_matrix");
 		glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		glBindVertexArray(VAOs[ModelVAO]);
-		glBindTexture(GL_TEXTURE_2D, textureId);
+		if (hasTexture) {
+			glBindTexture(GL_TEXTURE_2D, texture1);
+		}
+		
 		glDrawElements(GL_TRIANGLES, vertexIndices.size(), GL_UNSIGNED_INT, 0);
 
 	}
@@ -232,21 +187,60 @@ void Model::init() {
 			std::cout << vertexIndices[i] << ",";
 		}
 
-		std::cout << std::endl << "Texture indices: " << std::endl;
-
-		for (int i = 0; i < textureIndices.size(); i++) {
-			std::cout << textureIndices[i] << ",";
-		}
-
-		std::cout << std::endl << "Normal indices: " << std::endl;
-
-		for (int i = 0; i < normalIndices.size(); i++) {
-			std::cout << normalIndices[i] << ",";
-		}
 
 		std::cout << std::endl;
 	}
  
 
+	void Model::applyLighting() {
+		//Create Ambient lighting and add to shader
+		glm::vec4 ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+		GLuint aLoc = glGetUniformLocation(usedProgram, "ambient");
+		glUniform4fv(aLoc, 1, glm::value_ptr(ambient));
 
+		//Create the light object and apply to shader
+		glm::vec3 lightPos = glm::vec3(0.0f, 5.0f, 0.0f);
+		GLuint dLightPosLoc = glGetUniformLocation(usedProgram, "lightPos");
+		glUniform3fv(dLightPosLoc, 1, glm::value_ptr(lightPos));
 
+		//Create light diffusion and add to shader
+		glm::vec3 diffuseLight = glm::vec3(0.5f, 0.2f, 0.7f);
+		GLuint dLightLoc = glGetUniformLocation(usedProgram, "dLight");
+		glUniform3fv(dLightLoc, 1, glm::value_ptr(diffuseLight));
+
+		//Create specular light and add to shader
+		glm::vec3 specularLight = glm::vec3(0.7f);
+		GLfloat shininess = 256; //128 is max value
+		GLuint sLightLoc = glGetUniformLocation(usedProgram, "sLight");
+		GLuint sShineLoc = glGetUniformLocation(usedProgram, "sShine");
+		glUniform3fv(sLightLoc, 1, glm::value_ptr(specularLight));
+		glUniform1fv(sShineLoc, 1, &shininess);
+	}
+
+	void Model::bindTexture() {
+
+		glGenTextures(1, &texture1);
+		glBindTexture(GL_TEXTURE_2D, texture1);
+		// set the texture wrapping parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		// set texture filtering parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		// load image, create texture and generate mipmaps
+		GLint width, height, nrChannels;
+		stbi_set_flip_vertically_on_load(false); // tell stb_image.h to flip loaded texture's on the y-axis.
+		unsigned char* data = stbi_load(textureLocation.c_str(), &width, &height, &nrChannels, 0);
+
+		if (data) {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		else {
+			std::cout << "Failed to load texture" << std::endl;
+		}
+
+		stbi_image_free(data);
+
+		glUniform1i(glGetUniformLocation(usedProgram, "texture1"), 0);
+	}

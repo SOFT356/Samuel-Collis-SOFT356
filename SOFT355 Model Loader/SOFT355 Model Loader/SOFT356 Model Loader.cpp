@@ -7,26 +7,30 @@
 #include <iostream>
 #include <string>
 #include "ModelLoader.h"
+#include "ShaderLoader.h"
 
 int main()
 {
-
-	std::string fileLocation, doWeContinue;
-	Model model;
-	//Model model2;
+	std::string userInput, doWeContinue;
+	bool debug = false; 
+	bool wireFrame = false;
+	Model model, model2;
 
 	do {
 
 		do {
 			std::cout << "Please input the file location of the object or enter \"quit\" to close\n";
-			std::cin >> fileLocation;
+			std::cin >> userInput;
 
-			if (fileLocation._Equal("quit")) {
+			if (userInput._Equal("quit")) {
 				return 0;
 			}
-			model = loadFromFile(fileLocation);
-			//model2 = loadFromFile(fileLocation);
 
+		
+			model = loadFromFile(userInput);
+			model2 = loadFromFile(userInput);
+	
+			
 			if (!model.createdSuccessfully) {
 				std::cout << "There was an issue loading your file, please try another" << std::endl;
 			}
@@ -35,13 +39,22 @@ int main()
 
 		glfwInit();
 
-		GLFWwindow* window = glfwCreateWindow(800, 600, fileLocation.c_str(), NULL, NULL);
+		GLFWwindow* window = glfwCreateWindow(800, 600, userInput.c_str(), NULL, NULL);
 
 		glfwMakeContextCurrent(window);
 		glewInit();
 
-		model.init();
-		/*model2.init();*/
+		ShaderInfo  shaders[] =
+		{
+			{ GL_VERTEX_SHADER, "media/triangles.vert" },
+			{ GL_FRAGMENT_SHADER, "media/triangles.frag" },
+			{ GL_NONE, NULL }
+		};
+
+		GLuint program = LoadShaders(shaders);
+		
+		model.init(program);
+		model2.init(program);
 
 		GLfloat xdelta = 0.0f;
 		GLfloat ydelta = 0.0f;
@@ -51,21 +64,25 @@ int main()
 		GLfloat move = 1.0f;
 		GLfloat scaleIncrament = 0.005f;
 
-		//model.debug();
-
+		if (debug) {
+			model.debug();
+		}
+		
 		do {
 			// uncomment to draw only wireframe 
-			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+			if (wireFrame) {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+			
 			model.translate(0, 0, -4);
 			model.rotate(xdelta, ydelta, zdelta);
 			model.scale(scale);
 			model.draw();
-			
-			/*model2.translate(0, 0, -4);
+
+			model2.translate(0, -2, -4);
 			model2.rotate(xdelta, ydelta, zdelta);
-			model2.scale(scale);
-			model2.draw();*/
+			model2.scale(scale * 2);
+			model2.draw();
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -104,7 +121,7 @@ int main()
 			glfwWindowShouldClose(window) == 0);
 
 		model.destroy();
-		//model2.destroy();
+		model2.destroy();
 
 		glfwDestroyWindow(window);
 
@@ -112,6 +129,9 @@ int main()
 
 		std::cout << "Type \"quit\" to exit out of the application, enter anything else to prompted to load another file" << std::endl;
 		std::cin >> doWeContinue;
+
+		debug = false;
+		wireFrame = false;
 
 	} while (!doWeContinue._Equal("quit"));
 
