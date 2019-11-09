@@ -13,13 +13,19 @@ int main()
 
 	std::string fileLocation, doWeContinue;
 	Model model;
+	//Model model2;
 
 	do {
 
 		do {
-			std::cout << "Please input the file location of the object\n";
+			std::cout << "Please input the file location of the object or enter \"quit\" to close\n";
 			std::cin >> fileLocation;
+
+			if (fileLocation._Equal("quit")) {
+				return 0;
+			}
 			model = loadFromFile(fileLocation);
+			//model2 = loadFromFile(fileLocation);
 
 			if (!model.createdSuccessfully) {
 				std::cout << "There was an issue loading your file, please try another" << std::endl;
@@ -35,45 +41,61 @@ int main()
 		glewInit();
 
 		model.init();
+		/*model2.init();*/
+
 		GLfloat xdelta = 0.0f;
 		GLfloat ydelta = 0.0f;
 		GLfloat zdelta = 0.0f;
 		GLfloat scale = 1.0f;
 
+		GLfloat move = 1.0f;
+		GLfloat scaleIncrament = 0.005f;
+
+		//model.debug();
+
 		do {
 			// uncomment to draw only wireframe 
-			 //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			model.draw(xdelta, ydelta, zdelta, scale);
+			model.translate(0, 0, -4);
+			model.rotate(xdelta, ydelta, zdelta);
+			model.scale(scale);
+			model.draw();
+			
+			/*model2.translate(0, 0, -4);
+			model2.rotate(xdelta, ydelta, zdelta);
+			model2.scale(scale);
+			model2.draw();*/
+
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 
 			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-				ydelta += 1.0f;
+				ydelta -= move;
 			}
 
 			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-				ydelta -= 1.0f;
+				ydelta += move;
 			}
 
 			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-				xdelta -= 1.0f;
+				xdelta -= move;
 			}
 
 			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-				xdelta -= -1.0f;
+				xdelta += move;
 			}
 
 			if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) {
-				scale += 0.005f;
+				scale += scaleIncrament;
 			}
 
 			if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
-				scale += -0.005f;
+				scale -= scaleIncrament;
 			}
 
 			if (scale < 0) {
-				scale = 0;
+				scale = 0.0000001;
 			}
 
 
@@ -81,6 +103,8 @@ int main()
 		while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
 			glfwWindowShouldClose(window) == 0);
 
+		model.destroy();
+		//model2.destroy();
 
 		glfwDestroyWindow(window);
 

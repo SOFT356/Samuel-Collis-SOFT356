@@ -72,11 +72,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\scollis\Desktop\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\scollis\Desktop\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -159,7 +159,6 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="SOFT355 Model Loader.cpp" />
-    <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -169,7 +168,6 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="stb_image.h" />
-    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

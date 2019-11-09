@@ -7,37 +7,52 @@
 #include <vector>
 #include <iostream>
 
-using std::vector;
-
-struct Texture {
-	unsigned int id;
-	std::string type;
-};
-
 class Model
 {
 
 public:
-	vector<glm::vec3> vertices;
-	vector<glm::vec2> textures;
-	vector<glm::vec3> normals;
+	//Vertex info
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> textures;
+	std::vector<glm::vec3> normals;
 
-	vector<GLuint> vertexIndices;
-	vector<GLuint> textureIndices;
-	vector<GLuint> normalIndices;
+	//Indice info
+	std::vector<GLuint> vertexIndices;
+	std::vector<GLuint> textureIndices;
+	std::vector<GLuint> normalIndices;
+
+	//how the object is rotated
+	glm::vec3 rotation;
+	//the location of the object
+	glm::vec3 location;
+	//the size of the object
+	GLfloat scaleFactor;
 
 	bool createdSuccessfully = false;
+	
 
+	//Initialise
 	void init();
 
-	void draw(GLfloat xdelta, GLfloat ydelta, GLfloat zdelta, GLfloat scale);
+	//Draw model
+	void draw();
 
-	void translate();
+	//Move the model
+	void translate(GLfloat x, GLfloat y, GLfloat z);
+	void translate(glm::vec3 position);
 
-	void rotate();
+	//Change the size of the model
+	void scale(GLfloat scale);
 
-	void transform();
-
+	//Rotate the model
+	void rotate(GLfloat xdelta, GLfloat ydelta, GLfloat zdelta);
+	void rotate(glm::vec3 rotation);
+	
+	//clear up memory of model
+	void destroy();
+	
+	//Print the variables to the console
+	void debug();
 
 };
 
