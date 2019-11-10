@@ -19,7 +19,7 @@ enum Buffer_IDs { Vertices, Normals, Textures, VertexIndices, NumBuffers = 5 };
 
 GLuint VAOs[NumVAOs];
 GLuint Buffers[NumBuffers];
-GLuint texture1;
+GLuint textureId;
 
 GLuint usedProgram;
 
@@ -81,8 +81,8 @@ void Model::init(GLuint program) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Only render faces we can see
-		glFrontFace(GL_CW);
-		glCullFace(GL_BACK);
+	/*	glFrontFace(GL_CW);
+		glCullFace(GL_BACK);*/
 		glEnable(GL_CULL_FACE);
 
 		//Create a model matrix
@@ -91,14 +91,15 @@ void Model::init(GLuint program) {
 		//Use the scale factor to scale the object
 		model = glm::scale(model, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
 
-		// creating the view matrix
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::translate(view, location);
 		//perform rotations 
 		model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
+		// creating the view matrix
+		glm::mat4 view = glm::mat4(1.0f);
+		view = glm::translate(view, location);
+		
 		// creating the projection matrix
 		glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3, 0.1f, 20.0f);
 
@@ -114,7 +115,7 @@ void Model::init(GLuint program) {
 
 		glBindVertexArray(VAOs[ModelVAO]);
 		if (hasTexture) {
-			glBindTexture(GL_TEXTURE_2D, texture1);
+			glBindTexture(GL_TEXTURE_2D, textureId);
 		}
 		
 		glDrawElements(GL_TRIANGLES, vertexIndices.size(), GL_UNSIGNED_INT, 0);
@@ -194,7 +195,7 @@ void Model::init(GLuint program) {
 
 	void Model::applyLighting() {
 		//Create Ambient lighting and add to shader
-		glm::vec4 ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+		glm::vec4 ambient = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		GLuint aLoc = glGetUniformLocation(usedProgram, "ambient");
 		glUniform4fv(aLoc, 1, glm::value_ptr(ambient));
 
@@ -219,8 +220,8 @@ void Model::init(GLuint program) {
 
 	void Model::bindTexture() {
 
-		glGenTextures(1, &texture1);
-		glBindTexture(GL_TEXTURE_2D, texture1);
+		glGenTextures(1, &textureId);
+		glBindTexture(GL_TEXTURE_2D, textureId);
 		// set the texture wrapping parameters
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -229,7 +230,7 @@ void Model::init(GLuint program) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		// load image, create texture and generate mipmaps
 		GLint width, height, nrChannels;
-		stbi_set_flip_vertically_on_load(false); // tell stb_image.h to flip loaded texture's on the y-axis.
+		stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
 		unsigned char* data = stbi_load(textureLocation.c_str(), &width, &height, &nrChannels, 0);
 
 		if (data) {
@@ -242,5 +243,5 @@ void Model::init(GLuint program) {
 
 		stbi_image_free(data);
 
-		glUniform1i(glGetUniformLocation(usedProgram, "texture1"), 0);
+		glUniform1i(glGetUniformLocation(usedProgram, "textureId"), 0);
 	}

@@ -1,9 +1,8 @@
 #version 400 core
 
 layout( location = 0 ) in vec3 vPosition;
-layout( location = 1 ) in vec4 vColour;
-layout( location = 2 ) in vec3 vNormal;
-layout (location = 3) in vec2 aTexCoord;
+layout( location = 1 ) in vec3 vNormal;
+layout (location = 2) in vec2 aTexCoord;
 
 uniform vec3 lightPos;
 
@@ -45,7 +44,7 @@ main()
 	vec3 diffuse = max(0.0, dot(N,L)) * dLight;
 	vec3 specular = pow(max(dot(R,V), 0.0), sShine) * sLight;
 
-	fragColour =  (ambient + vec4(diffuse,1.0) + vec4(specular,1.0) ) * vColour;
+	fragColour =  (ambient + vec4(diffuse,1.0) + vec4(specular,1.0) );
 
 	gl_Position = p_matrix * P;
 	TexCoord = aTexCoord;

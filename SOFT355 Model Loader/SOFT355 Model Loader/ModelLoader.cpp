@@ -20,7 +20,7 @@ Model loadFromObj(std::string file) {
 	std::string line;
 
 	//Create out variables to hold the parsed data untill the end
-	std::vector<GLuint> vertexIndices, textureIndices, normalIndices;
+	std::vector<GLuint> vertexIndices, textureIndices, normalIndices, faceSize;
 	std::vector<glm::vec3> temp_vertices;
 	std::vector<glm::vec2> temp_textures;
 	std::vector<glm::vec3> temp_normals;
@@ -43,8 +43,6 @@ Model loadFromObj(std::string file) {
 			else if (lineStart._Equal("vt")) {
 				glm::vec2 texture;
 				sscanf_s(line.c_str(), "vt %f %f\n", &texture.x, &texture.y);
-				texture.x = 1 - texture.x; 
-				texture.y = 1 - texture.y;
 				temp_textures.push_back(texture);
 			}
 			//vn indicates a vertex normal
@@ -91,7 +89,11 @@ Model loadFromObj(std::string file) {
 					vertexIndices.push_back(vertexIndex[3] - 1);
 					textureIndices.push_back(textureIndex[3] - 1);
 					normalIndices.push_back(normalIndex[3] - 1);
-	
+
+					faceSize.push_back(4);
+				}
+				else {
+					faceSize.push_back(3);
 				}
 
 			}
@@ -110,21 +112,36 @@ Model loadFromObj(std::string file) {
 		//same as above but shorthand
 		model.textures.push_back(temp_textures[textureIndices[i]]);
 	}
+	//model.textures = temp_textures;
 
 	for (int i = 0; i < normalIndices.size(); i++) {
 		model.normals.push_back(temp_normals[normalIndices[i]]);
 	}
 
 
-	for (int i = 0; i < model.vertices.size(); i += 4) {
-		model.vertexIndices.push_back(i + 0);
-		model.vertexIndices.push_back(i + 1);
-		model.vertexIndices.push_back(i + 2);
+	int h = 0;
 
-		model.vertexIndices.push_back(i + 2);
-		model.vertexIndices.push_back(i + 3);
-		model.vertexIndices.push_back(i + 0);
-	}
+		for (int i = 0; i < model.vertices.size(); i += faceSize[h]) {
+			model.vertexIndices.push_back(i + 0);
+			model.vertexIndices.push_back(i + 1);
+			model.vertexIndices.push_back(i + 2);
+
+			if (faceSize[h] == 4) {
+				model.vertexIndices.push_back(i + 2);
+				model.vertexIndices.push_back(i + 3);
+				model.vertexIndices.push_back(i + 0);
+			}
+
+			if (i + faceSize[h] != model.vertices.size()) {
+				h++;
+			}
+		
+		}
+	
+
+
+	model.textureIndices = model.vertexIndices;
+	model.normalIndices = model.vertexIndices;
 
 	rfile.close();
 

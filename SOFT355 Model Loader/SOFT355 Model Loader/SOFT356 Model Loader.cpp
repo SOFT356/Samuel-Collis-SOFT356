@@ -28,7 +28,7 @@ int main()
 
 		
 			model = loadFromFile(userInput);
-			model2 = loadFromFile(userInput);
+			//model2 = loadFromFile(userInput);
 	
 			
 			if (!model.createdSuccessfully) {
@@ -54,7 +54,7 @@ int main()
 		GLuint program = LoadShaders(shaders);
 		
 		model.init(program);
-		model2.init(program);
+		//model2.init(program);
 
 		GLfloat xdelta = 0.0f;
 		GLfloat ydelta = 0.0f;
@@ -79,10 +79,10 @@ int main()
 			model.scale(scale);
 			model.draw();
 
-			model2.translate(0, -2, -4);
+			/*model2.translate(0, -2, -4);
 			model2.rotate(xdelta, ydelta, zdelta);
 			model2.scale(scale * 2);
-			model2.draw();
+			model2.draw();*/
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -121,7 +121,7 @@ int main()
 			glfwWindowShouldClose(window) == 0);
 
 		model.destroy();
-		model2.destroy();
+		//model2.destroy();
 
 		glfwDestroyWindow(window);
 
