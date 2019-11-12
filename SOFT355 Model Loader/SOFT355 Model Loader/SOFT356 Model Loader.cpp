@@ -9,15 +9,73 @@
 #include "ModelLoader.h"
 #include "ShaderLoader.h"
 
+GLfloat move = 1.0f;
+GLfloat scaleIncrament = 0.005f;
+
+glm::vec3 cameraLoc = glm::vec3(0.0f, 0.0f, -4.0f);
+
+void processKeyEvents(GLFWwindow* window, glm::vec3 &rotation, GLfloat &scale) {
+	
+	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
+		cameraLoc.y += 0.01f;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
+		cameraLoc.y -= 0.01f;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+		cameraLoc.x += 0.01f;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+		cameraLoc.x -= 0.01f;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
+		cameraLoc.z += 0.01f;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
+		cameraLoc.z -= 0.01f;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		rotation.y -= move;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		rotation.y += move;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		rotation.x -= move;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		rotation.x += move;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) {
+		scale += scaleIncrament;
+	} 
+	
+	if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
+		scale -= scaleIncrament;
+	} 
+	
+	if (scale < 0) {
+		scale = 0.0000001;
+	}
+}
+
+
 int main()
 {
 	std::string userInput, doWeContinue;
-	bool debug = false; 
-	bool wireFrame = false;
 	Model model, model2;
 
 	do {
-
 		do {
 			std::cout << "Please input the file location of the object or enter \"quit\" to close\n";
 			std::cin >> userInput;
@@ -25,12 +83,10 @@ int main()
 			if (userInput._Equal("quit")) {
 				return 0;
 			}
-
 		
 			model = loadFromFile(userInput);
-			//model2 = loadFromFile(userInput);
+			model2 = loadFromFile(userInput);
 	
-			
 			if (!model.createdSuccessfully) {
 				std::cout << "There was an issue loading your file, please try another" << std::endl;
 			}
@@ -54,74 +110,39 @@ int main()
 		GLuint program = LoadShaders(shaders);
 		
 		model.init(program);
-		//model2.init(program);
+		model2.init(program);
 
-		GLfloat xdelta = 0.0f;
-		GLfloat ydelta = 0.0f;
-		GLfloat zdelta = 0.0f;
+
+		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 		GLfloat scale = 1.0f;
-
-		GLfloat move = 1.0f;
-		GLfloat scaleIncrament = 0.005f;
-
-		if (debug) {
-			model.debug();
-		}
 		
 		do {
-			// uncomment to draw only wireframe 
-			if (wireFrame) {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			}
-			
-			model.translate(0, 0, -4);
-			model.rotate(xdelta, ydelta, zdelta);
-			model.scale(scale);
-			model.draw();
 
-			/*model2.translate(0, -2, -4);
-			model2.rotate(xdelta, ydelta, zdelta);
-			model2.scale(scale * 2);
-			model2.draw();*/
+			model.debug();
+			model2.debug();
+
+			model.translate(0, 2, -4);
+			model.rotate(rotation);
+			model.scale(scale);
+			model.draw(cameraLoc);
+
+			model2.translate(0, 0, -4);
+			model2.rotate(rotation);
+			model2.scale(scale);
+			model2.draw(cameraLoc);
+
+			processKeyEvents(window, rotation, scale);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 
-			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-				ydelta -= move;
-			}
-
-			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-				ydelta += move;
-			}
-
-			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-				xdelta -= move;
-			}
-
-			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-				xdelta += move;
-			}
-
-			if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) {
-				scale += scaleIncrament;
-			}
-
-			if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
-				scale -= scaleIncrament;
-			}
-
-			if (scale < 0) {
-				scale = 0.0000001;
-			}
-
-
+			
 		} // Check if the ESC key was pressed or the window was closed
 		while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
 			glfwWindowShouldClose(window) == 0);
 
 		model.destroy();
-		//model2.destroy();
+		model2.destroy();
 
 		glfwDestroyWindow(window);
 
@@ -130,11 +151,9 @@ int main()
 		std::cout << "Type \"quit\" to exit out of the application, enter anything else to prompted to load another file" << std::endl;
 		std::cin >> doWeContinue;
 
-		debug = false;
-		wireFrame = false;
-
 	} while (!doWeContinue._Equal("quit"));
 
 	
 
 }
+

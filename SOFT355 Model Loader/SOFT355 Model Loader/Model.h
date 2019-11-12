@@ -18,26 +18,36 @@ public:
 
 	//Indice info
 	std::vector<GLuint> vertexIndices;
-	std::vector<GLuint> textureIndices;
-	std::vector<GLuint> normalIndices;
 
 	//how the object is rotated
 	glm::vec3 rotation;
 	//the location of the object
 	glm::vec3 location;
+
 	//the size of the object
 	GLfloat scaleFactor;
 
+	//Texture info
 	bool hasTexture = false;
 	std::string textureLocation;
 
+	//Indicator if the model was loaded properly
 	bool createdSuccessfully = false;
+
+	enum VAO_IDs { ModelVAO, NumVAOs = 1 };
+	enum Buffer_IDs { Vertices, Normals, Textures, VertexIndices, NumBuffers = 5 };
+
+	GLuint VAOs[NumVAOs];
+	GLuint Buffers[NumBuffers];
+	GLuint textureId;
+
+	GLuint usedProgram;
 
 	//Initialise
 	void init(GLuint program);
 
 	//Draw model
-	void draw();
+	void draw(glm::vec3 camera);
 
 	//Move the model
 	void translate(GLfloat x, GLfloat y, GLfloat z);
@@ -58,8 +68,10 @@ public:
 	
 private: 
 
+	//Apply the lighting
 	void applyLighting();
 
+	//Bind the texture
 	void bindTexture();
 
 };

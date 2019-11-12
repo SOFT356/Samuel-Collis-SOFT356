@@ -9,7 +9,6 @@ uniform vec3 lightPos;
 uniform vec4 ambient;
 uniform vec3 dLight;
 
-
 uniform vec3 sLight;
 uniform float sShine;
 
@@ -47,5 +46,6 @@ main()
 	fragColour =  (ambient + vec4(diffuse,1.0) + vec4(specular,1.0) );
 
 	gl_Position = p_matrix * P;
+
 	TexCoord = aTexCoord;
 }

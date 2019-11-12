@@ -1,4 +1,7 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(452,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (SOFT355 Model Loader.vcxproj).  This can lead to incorrect clean and rebuild behavior.
   Model.cpp
-E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\Model.cpp(121,72): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  SOFT356 Model Loader.cpp
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\Model.cpp(120,72): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  Generating Code...
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\SOFT356 Model Loader.cpp(68,20): warning C4305: '=': truncation from 'double' to 'GLfloat'
   SOFT355 Model Loader.vcxproj -> E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\x64\Debug\SOFT356 Model Loader.exe

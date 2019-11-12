@@ -54,8 +54,8 @@ Model loadFromObj(std::string file) {
 			//f indicates a face
 			else if (lineStart._Equal("f ")) {
 				unsigned int vertexIndex[4], textureIndex[4], normalIndex[4];
-				int matches = sscanf_s(line.c_str(), 
-					"f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n", 
+				int matches = sscanf_s(line.c_str(),
+					"f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n",
 					&vertexIndex[0], &textureIndex[0], &normalIndex[0],
 					&vertexIndex[1], &textureIndex[1], &normalIndex[1],
 					&vertexIndex[2], &textureIndex[2], &normalIndex[2],
@@ -70,7 +70,8 @@ Model loadFromObj(std::string file) {
 					return model;
 				}
 
-				//so triangle 1
+				//so for triangle 1 we need these
+				//we subtract 1 from each index as arrays start from 0 in cpp
 				vertexIndices.push_back(vertexIndex[0] - 1);
 				vertexIndices.push_back(vertexIndex[1] - 1);
 				vertexIndices.push_back(vertexIndex[2] - 1);
@@ -85,14 +86,16 @@ Model loadFromObj(std::string file) {
 
 				if (matches == 12) {
 
-					//triangle 2
+					//and for triangle 2 we need to add the final vertex of th
 					vertexIndices.push_back(vertexIndex[3] - 1);
 					textureIndices.push_back(textureIndex[3] - 1);
 					normalIndices.push_back(normalIndex[3] - 1);
 
+					//if we have 12 matches then we have a quadrilateral
 					faceSize.push_back(4);
 				}
 				else {
+					//else we just have a triangle
 					faceSize.push_back(3);
 				}
 
@@ -101,10 +104,12 @@ Model loadFromObj(std::string file) {
 		}
 	}
 
+	//We want to push all of temp vertices into the object
 	for (int i = 0; i < vertexIndices.size(); i++) {
 		int vertexIndex = vertexIndices[i];
 		glm::vec3 vertex = temp_vertices[vertexIndex];
 		model.vertices.push_back(vertex);
+		//model.vertices.push_back(temp_vertices[vertexIndices[i]]);
 	}
 
 
@@ -121,27 +126,22 @@ Model loadFromObj(std::string file) {
 
 	int h = 0;
 
-		for (int i = 0; i < model.vertices.size(); i += faceSize[h]) {
-			model.vertexIndices.push_back(i + 0);
-			model.vertexIndices.push_back(i + 1);
+	for (int i = 0; i < model.vertices.size(); i += faceSize[h]) {
+		model.vertexIndices.push_back(i + 0);
+		model.vertexIndices.push_back(i + 1);
+		model.vertexIndices.push_back(i + 2);
+
+		if (faceSize[h] == 4) {
 			model.vertexIndices.push_back(i + 2);
-
-			if (faceSize[h] == 4) {
-				model.vertexIndices.push_back(i + 2);
-				model.vertexIndices.push_back(i + 3);
-				model.vertexIndices.push_back(i + 0);
-			}
-
-			if (i + faceSize[h] != model.vertices.size()) {
-				h++;
-			}
-		
+			model.vertexIndices.push_back(i + 3);
+			model.vertexIndices.push_back(i + 0);
 		}
-	
 
+		if (i + faceSize[h] != model.vertices.size()) {
+			h++;
+		}
 
-	model.textureIndices = model.vertexIndices;
-	model.normalIndices = model.vertexIndices;
+	}
 
 	rfile.close();
 
