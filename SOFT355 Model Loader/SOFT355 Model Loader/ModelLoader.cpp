@@ -163,7 +163,6 @@ Model loadFromObj(std::string file) {
 				//use a different directional slash to indicate folder structure
 				char fileDelimiter = file.find("\\") != std::string::npos ? '\\' : '/';
 				model.textureLocation = file.substr(0, file.find_last_of(fileDelimiter) + 1) + model.textureLocation;
-				std::cout << model.textureLocation << std::endl;
 				model.hasTexture = true;
 			}
 		}

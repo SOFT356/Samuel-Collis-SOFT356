@@ -65,13 +65,6 @@ void Model::init(GLuint program) {
 	}
 
 	void Model::draw(glm::vec3 camera) {
-		static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		
-		glClearBufferfv(GL_COLOR, 0, black);
-
-		//Set the background to a dark red
-		glClearColor(0.2f, 0, 0, 0);
-		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Only render faces we can see
 		glEnable(GL_CULL_FACE);
@@ -163,6 +156,7 @@ void Model::init(GLuint program) {
 
 		std::cout << "Program: " << usedProgram << std::endl;
 		std::cout << "VAO:" << VAOs[0] << std::endl;
+		std::cout << "VAO Model:" << VAOs[ModelVAO] << std::endl;
 		std::cout << "Buffer 0:" << Buffers[0] << std::endl;
 		std::cout << "Buffer 1:" << Buffers[1] << std::endl;
 		std::cout << "Buffer 2:" << Buffers[2] << std::endl;

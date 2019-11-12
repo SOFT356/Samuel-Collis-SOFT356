@@ -21,7 +21,7 @@ void processKeyEvents(GLFWwindow* window, glm::vec3 &rotation, GLfloat &scale) {
 	} 
 	
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
-		cameraLoc.y = 0.01f;
+		cameraLoc.y += 0.01f;
 	} 
 	
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
@@ -112,16 +112,13 @@ int main()
 		model.init(program);
 		model2.init(program);
 
-
+		static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 		GLfloat scale = 1.0f;
 		
 		do {
 
-			model.debug();
-			model2.debug();
-
-			model.translate(0, 2, -4);
+			model.translate(2, 2, -4);
 			model.rotate(rotation);
 			model.scale(scale);
 			model.draw(cameraLoc);
@@ -136,6 +133,9 @@ int main()
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 
+			glClearBufferfv(GL_COLOR, 0, black);
+			glClearColor(0.2f, 0, 0, 0);
+			glClear(GL_COLOR_BUFFER_BIT);
 			
 		} // Check if the ESC key was pressed or the window was closed
 		while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
