@@ -17,11 +17,11 @@ glm::vec3 cameraLoc = glm::vec3(0.0f, 0.0f, -4.0f);
 void processKeyEvents(GLFWwindow* window, glm::vec3 &rotation, GLfloat &scale) {
 	
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
-		cameraLoc.y += 0.01f;
+		cameraLoc.y -= 0.01f;
 	} 
 	
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
-		cameraLoc.y -= 0.01f;
+		cameraLoc.y = 0.01f;
 	} 
 	
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {

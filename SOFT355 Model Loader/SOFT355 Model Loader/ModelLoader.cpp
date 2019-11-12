@@ -21,9 +21,9 @@ Model loadFromObj(std::string file) {
 
 	//Create out variables to hold the parsed data untill the end
 	std::vector<GLuint> vertexIndices, textureIndices, normalIndices, faceSize;
-	std::vector<glm::vec3> temp_vertices;
-	std::vector<glm::vec2> temp_textures;
-	std::vector<glm::vec3> temp_normals;
+	std::vector<glm::vec3> tempVertices;
+	std::vector<glm::vec2> tempTextures;
+	std::vector<glm::vec3> tempNormals;
 
 	//Create a string to hold the first two characters of each line just so we aren't making a method call each if check
 	std::string lineStart;
@@ -37,19 +37,19 @@ Model loadFromObj(std::string file) {
 			if (lineStart._Equal("v ")) {
 				glm::vec3 vertex;
 				sscanf_s(line.c_str(), "v %f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-				temp_vertices.push_back(vertex);
+				tempVertices.push_back(vertex);
 			}
 			//vt indicates a texture vertex
 			else if (lineStart._Equal("vt")) {
 				glm::vec2 texture;
 				sscanf_s(line.c_str(), "vt %f %f\n", &texture.x, &texture.y);
-				temp_textures.push_back(texture);
+				tempTextures.push_back(texture);
 			}
 			//vn indicates a vertex normal
 			else if (lineStart._Equal("vn")) {
 				glm::vec3 normal;
 				sscanf_s(line.c_str(), "vn %f %f %f\n", &normal.x, &normal.y, &normal.z);
-				temp_normals.push_back(normal);
+				tempNormals.push_back(normal);
 			}
 			//f indicates a face
 			else if (lineStart._Equal("f ")) {
@@ -107,25 +107,27 @@ Model loadFromObj(std::string file) {
 	//We want to push all of temp vertices into the object
 	for (int i = 0; i < vertexIndices.size(); i++) {
 		int vertexIndex = vertexIndices[i];
-		glm::vec3 vertex = temp_vertices[vertexIndex];
+		glm::vec3 vertex = tempVertices[vertexIndex];
 		model.vertices.push_back(vertex);
-		//model.vertices.push_back(temp_vertices[vertexIndices[i]]);
 	}
 
 
 	for (int i = 0; i < textureIndices.size(); i++) {
 		//same as above but shorthand
-		model.textures.push_back(temp_textures[textureIndices[i]]);
+		model.textures.push_back(tempTextures[textureIndices[i]]);
 	}
 	//model.textures = temp_textures;
 
 	for (int i = 0; i < normalIndices.size(); i++) {
-		model.normals.push_back(temp_normals[normalIndices[i]]);
+		model.normals.push_back(tempNormals[normalIndices[i]]);
 	}
 
 
 	int h = 0;
 
+	//We take the value from the facesize and incrament by it to make sure we read
+	//and construct objects correctly that used mixed n-gon faces like the low poly
+	//boat
 	for (int i = 0; i < model.vertices.size(); i += faceSize[h]) {
 		model.vertexIndices.push_back(i + 0);
 		model.vertexIndices.push_back(i + 1);
@@ -171,13 +173,14 @@ Model loadFromObj(std::string file) {
 	rfile.close();
 
 	//Performing a swap with an empty vector will free up the memory used
-	std::vector<glm::vec3>().swap(temp_vertices);
-	std::vector<glm::vec3>().swap(temp_normals);
-	std::vector<glm::vec2>().swap(temp_textures);
+	std::vector<glm::vec3>().swap(tempVertices);
+	std::vector<glm::vec3>().swap(tempNormals);
+	std::vector<glm::vec2>().swap(tempTextures);
 	std::vector<GLuint>().swap(vertexIndices);
 	std::vector<GLuint>().swap(textureIndices);
 	std::vector<GLuint>().swap(normalIndices);
 
+	//If there are no vertices then we have probably created the object incorrectly
 	if (model.vertices.size() == 0) {
 		model.createdSuccessfully = false;
 	}

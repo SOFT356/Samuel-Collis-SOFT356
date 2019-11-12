@@ -168,6 +168,9 @@ void Model::init(GLuint program) {
 		std::cout << "Buffer 2:" << Buffers[2] << std::endl;
 		std::cout << "Buffer 3:" << Buffers[3] << std::endl;
 		std::cout << "Buffer 4:" << Buffers[4] << std::endl;
+		std::cout << "Location: " << location.x << ":" << location.y << ":" << location.z << std::endl;
+		std::cout << "Rotation: " << rotation.x << ":" << rotation.y << ":" << rotation.z << std::endl;
+
 
 		//std::cout << "I have " << vertices.size() << " vertices" << std::endl;
 		//std::cout << "I have " << textures.size() << " textures" << std::endl;
