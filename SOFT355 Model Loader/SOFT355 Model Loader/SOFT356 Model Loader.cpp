@@ -14,56 +14,56 @@ GLfloat scaleIncrament = 0.005f;
 
 glm::vec3 cameraLoc = glm::vec3(0.0f, 0.0f, -4.0f);
 
-void processKeyEvents(GLFWwindow* window, glm::vec3 &rotation, GLfloat &scale) {
-	
+void processKeyEvents(GLFWwindow* window, glm::vec3& rotation, GLfloat& scale) {
+
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
 		cameraLoc.y -= 0.01f;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
 		cameraLoc.y += 0.01f;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
 		cameraLoc.x += 0.01f;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
 		cameraLoc.x -= 0.01f;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
 		cameraLoc.z += 0.01f;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
 		cameraLoc.z -= 0.01f;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		rotation.y -= move;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		rotation.y += move;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		rotation.x -= move;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		rotation.x += move;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) {
 		scale += scaleIncrament;
-	} 
-	
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
 		scale -= scaleIncrament;
-	} 
-	
+	}
+
 	if (scale < 0) {
 		scale = 0.0000001;
 	}
@@ -72,45 +72,76 @@ void processKeyEvents(GLFWwindow* window, glm::vec3 &rotation, GLfloat &scale) {
 
 int main()
 {
-	std::string userInput, doWeContinue;
-	Model model, model2;
+	//Variable for storing the users input
+	std::string userInput;
+
+	//Temp variables for creation
+	Model model;
+	glm::vec3 location;
+
+	//Stores for the models and locations
+	std::vector<Model> models;
+	std::vector<glm::vec3> modelLocations;
 
 	do {
+
 		do {
-			std::cout << "Please input the file location of the object or enter \"quit\" to close\n";
-			std::cin >> userInput;
+
+			std::cout << "Please input the file location of the object or enter \"quit\" to close.\n";
+
+			//If we have more than one model then we are able to render the scene.
+			if (models.size() > 0) {
+				std::cout << "You can also type \"render\" to begin to render your scene.\n";
+			}
+			std::getline(std::cin, userInput);
 
 			if (userInput._Equal("quit")) {
 				return 0;
 			}
-		
-			model = loadFromFile(userInput);
-			model2 = loadFromFile(userInput);
-	
-			if (!model.createdSuccessfully) {
-				std::cout << "There was an issue loading your file, please try another" << std::endl;
+			else if (userInput._Equal("render") && models.size() > 0) {
+				break;
+			}
+			else if (userInput._Equal("render") && models.size() == 0) {
+				std::cout << "We have safe guarded against empty scene rendering," <<
+					"\nplease add at least one model and location." << std::endl;
+				continue;
 			}
 
-		} while (!model.createdSuccessfully);
+			model = loadFromFile(userInput);
+
+			if (!model.createdSuccessfully) {
+				std::cout << "There was an issue loading your file, please try another" << std::endl;
+				continue;
+			}
+
+			models.push_back(model);
+
+			do {
+				std::cout << "Please input Location you would like to render the object at in the format 'x y z'\n";
+				std::getline(std::cin, userInput);
+
+				if (sscanf_s(userInput.c_str(), "%f %f %f\n", &location.x, &location.y, &location.z) == 3) {
+					modelLocations.push_back(location);
+					break;
+				}
+				else {
+					std::cout << "We were unable to parse the input, please try agian\n";
+				}
+			} while (true);
+		
+		} while (true);
 
 		glfwInit();
 
-		GLFWwindow* window = glfwCreateWindow(800, 600, userInput.c_str(), NULL, NULL);
+		//Create our window
+		GLFWwindow* window = glfwCreateWindow(800, 600, "Object Loader", NULL, NULL);
 
 		glfwMakeContextCurrent(window);
 		glewInit();
-
-		ShaderInfo  shaders[] =
-		{
-			{ GL_VERTEX_SHADER, "media/triangles.vert" },
-			{ GL_FRAGMENT_SHADER, "media/triangles.frag" },
-			{ GL_NONE, NULL }
-		};
-
-		GLuint program = LoadShaders(shaders);
 		
-		model.init(program);
-		model2.init(program);
+		for (int i = 0; i < models.size(); i++) {
+			models[i].init();
+		}
 
 		static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -118,15 +149,13 @@ int main()
 		
 		do {
 
-			model.translate(2, 2, -4);
-			model.rotate(rotation);
-			model.scale(scale);
-			model.draw(cameraLoc);
-
-			model2.translate(0, 0, -4);
-			model2.rotate(rotation);
-			model2.scale(scale);
-			model2.draw(cameraLoc);
+			for (int i = 0; i < models.size(); i++) {
+				models[i].translate(modelLocations[i]);
+				models[i].rotate(rotation);
+				models[i].scale(scale);
+				models[i].setCameraLocation(cameraLoc);
+				models[i].draw();
+			}
 
 			processKeyEvents(window, rotation, scale);
 
@@ -141,17 +170,22 @@ int main()
 		while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
 			glfwWindowShouldClose(window) == 0);
 
-		model.destroy();
-		model2.destroy();
+		for (int i = 0; i < models.size(); i++) {
+			models[i].destroy();
+		}
+
+
+		std::vector<Model>().swap(models);
+		std::vector<glm::vec3>().swap(modelLocations);
 
 		glfwDestroyWindow(window);
 
 		glfwTerminate();
 
 		std::cout << "Type \"quit\" to exit out of the application, enter anything else to prompted to load another file" << std::endl;
-		std::cin >> doWeContinue;
+		std::getline(std::cin, userInput);
 
-	} while (!doWeContinue._Equal("quit"));
+	} while (!userInput._Equal("quit"));
 
 	
 

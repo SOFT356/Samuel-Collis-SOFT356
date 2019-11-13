@@ -24,6 +24,8 @@ public:
 	//the location of the object
 	glm::vec3 location;
 
+	glm::vec3 cameraLocation;
+
 	//the size of the object
 	GLfloat scaleFactor;
 
@@ -44,10 +46,10 @@ public:
 	GLuint usedProgram;
 
 	//Initialise
-	void init(GLuint program);
+	void init();
 
 	//Draw model
-	void draw(glm::vec3 camera);
+	void draw();
 
 	//Move the model
 	void translate(GLfloat x, GLfloat y, GLfloat z);
@@ -59,12 +61,15 @@ public:
 	//Rotate the model
 	void rotate(GLfloat xdelta, GLfloat ydelta, GLfloat zdelta);
 	void rotate(glm::vec3 rotation);
+
+	//Set camera position
+	void setCameraLocation(glm::vec3 location);
 	
 	//clear up memory of model
 	void destroy();
 	
 	//Print the variables to the console
-	void debug();
+	void debug(bool verbose);
 	
 private: 
 
