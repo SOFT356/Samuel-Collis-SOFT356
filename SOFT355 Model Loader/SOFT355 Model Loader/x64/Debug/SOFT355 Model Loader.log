@@ -1,8 +1,38 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(452,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (SOFT355 Model Loader.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Model.cpp
   ModelLoader.cpp
-  SOFT356 Model Loader.cpp
-E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\Model.cpp(118,71): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-  Generating Code...
-E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\SOFT356 Model Loader.cpp(68,20): warning C4305: '=': truncation from 'double' to 'GLfloat'
-  SOFT355 Model Loader.vcxproj -> E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\x64\Debug\SOFT356 Model Loader.exe
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(276,17): error C3531: 'endTime': a symbol whose type contains 'auto' must have an initializer
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(316,47): error C2440: '=': cannot convert from 'std::chrono::system_clock::time_point' to 'int'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(316,45): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(317,61): error C2677: binary '-': no global operator found which takes type 'std::chrono::system_clock::time_point' (or there is no acceptable conversion)
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(318,72): error C2664: '__time64_t std::chrono::system_clock::to_time_t(const std::chrono::system_clock::time_point &) noexcept': cannot convert argument 1 from 'int' to 'const std::chrono::system_clock::time_point &'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(318,72): message : Reason: cannot convert from 'int' to 'const std::chrono::system_clock::time_point'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(318,72): message : No constructor could take the source type, or constructor overload resolution was ambiguous
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.23.28105\include\chrono(631,38): message : see declaration of 'std::chrono::system_clock::to_time_t'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(359,47): error C2440: '=': cannot convert from 'std::chrono::system_clock::time_point' to 'int'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(359,45): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(360,53): error C2086: 'std::chrono::duration<double,std::ratio<1,1>> elapsed_seconds': redefinition
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(317): message : see declaration of 'elapsed_seconds'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(360,61): error C2677: binary '-': no global operator found which takes type 'std::chrono::system_clock::time_point' (or there is no acceptable conversion)
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(361,17): error C2374: 'end_time': redefinition; multiple initialization
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(318): message : see declaration of 'end_time'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(361,72): error C2664: '__time64_t std::chrono::system_clock::to_time_t(const std::chrono::system_clock::time_point &) noexcept': cannot convert argument 1 from 'int' to 'const std::chrono::system_clock::time_point &'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(361,72): message : Reason: cannot convert from 'int' to 'const std::chrono::system_clock::time_point'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(361,72): message : No constructor could take the source type, or constructor overload resolution was ambiguous
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.23.28105\include\chrono(631,38): message : see declaration of 'std::chrono::system_clock::to_time_t'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(392,47): error C2440: '=': cannot convert from 'std::chrono::system_clock::time_point' to 'int'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(392,45): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(393,53): error C2086: 'std::chrono::duration<double,std::ratio<1,1>> elapsed_seconds': redefinition
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(317): message : see declaration of 'elapsed_seconds'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(393,61): error C2677: binary '-': no global operator found which takes type 'std::chrono::system_clock::time_point' (or there is no acceptable conversion)
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(394,17): error C2374: 'end_time': redefinition; multiple initialization
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(318): message : see declaration of 'end_time'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(394,72): error C2664: '__time64_t std::chrono::system_clock::to_time_t(const std::chrono::system_clock::time_point &) noexcept': cannot convert argument 1 from 'int' to 'const std::chrono::system_clock::time_point &'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(394,72): message : Reason: cannot convert from 'int' to 'const std::chrono::system_clock::time_point'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(394,72): message : No constructor could take the source type, or constructor overload resolution was ambiguous
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.23.28105\include\chrono(631,38): message : see declaration of 'std::chrono::system_clock::to_time_t'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(320,1): error C4996: 'ctime': This function or variable may be unsafe. Consider using ctime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\time.h(476): message : see declaration of 'ctime'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(363,1): error C4996: 'ctime': This function or variable may be unsafe. Consider using ctime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\time.h(476): message : see declaration of 'ctime'
+E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\SOFT355 Model Loader\ModelLoader.cpp(396,1): error C4996: 'ctime': This function or variable may be unsafe. Consider using ctime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\time.h(476): message : see declaration of 'ctime'

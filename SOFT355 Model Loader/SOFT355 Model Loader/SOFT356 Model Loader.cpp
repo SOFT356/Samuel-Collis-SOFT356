@@ -12,7 +12,7 @@
 GLfloat move = 1.0f;
 GLfloat scaleIncrament = 0.005f;
 
-glm::vec3 cameraLoc = glm::vec3(0.0f, 0.0f, -4.0f);
+glm::vec3 cameraLoc = glm::vec3(0.0f, 0.0f, 0.0f);
 
 void processKeyEvents(GLFWwindow* window, glm::vec3& rotation, GLfloat& scale) {
 
@@ -83,6 +83,10 @@ int main()
 	std::vector<Model> models;
 	std::vector<glm::vec3> modelLocations;
 
+	std::cout << "Please enter a location you would like to place the camera in the form: x y z\nAny non parsable format will reuslt in the camera being placed at 0,0,0" << std::endl;
+	std::getline(std::cin, userInput);
+	sscanf_s(userInput.c_str(), "%f %f %f", &cameraLoc.x, &cameraLoc.y, &cameraLoc.z);
+
 	do {
 
 		do {
@@ -146,6 +150,8 @@ int main()
 		static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 		GLfloat scale = 1.0f;
+
+		std::cout << "You are able to close the window with the Q key" << std::endl;
 		
 		do {
 

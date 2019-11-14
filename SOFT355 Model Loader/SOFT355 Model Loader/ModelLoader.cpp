@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <regex>
+#include <sstream>
 
 
 Model loadFromObj(std::string file) {
@@ -190,6 +192,222 @@ Model loadFromObj(std::string file) {
 	return model;
 }
 
+Model loadFromDae(std::string file) {
+
+	//Create the model to be returned
+	Model model;
+
+	//Log to the output that we're making the specified object
+	std::cout << "Creating from: " + file << std::endl;
+
+	//Create a file input stream
+	std::ifstream rfile;
+	rfile.open(file);
+
+	//Instantiate a variable to hold each line of the string
+	std::string line;
+
+	//Create out variables to hold the parsed data untill the end
+	std::vector<GLuint> vertexIndices, textureIndices, normalIndices, faceSize;
+	std::vector<glm::vec3> tempVertices;
+	std::vector<glm::vec2> tempTextures;
+	std::vector<glm::vec3> tempNormals;
+
+	//Create a string to hold the first two characters of each line just so we aren't making a method call each if check
+	std::string lineStart;
+
+	std::string segment = "";
+	bool libraryImg = false;
+	bool libraryGeo = false;
+
+	if (rfile.is_open()) {
+		while (std::getline(rfile, line)) {
+
+			//We want to remove all the white space
+			size_t endpos = line.find_last_not_of(" \t");
+			size_t startpos = line.find_first_not_of(" \t");
+			if (std::string::npos != endpos)
+			{
+				line = line.substr(0, endpos + 1);
+				line = line.substr(startpos);
+			}
+			
+			//std::cout << line << std::endl;
+			
+			if (line._Equal("<library_images>")) {
+				libraryImg = true;
+				
+			}
+			
+			if (libraryImg) {
+				segment += line;
+			}
+			
+			if (line._Equal("</library_images>")) {
+				libraryImg = false;
+
+				size_t start = segment.find("<init_from>");
+
+				std::regex initFrom(R"(<init_from>([\s\S]*?)<\/init_from>)", std::regex::icase);
+				std::copy(std::sregex_token_iterator(segment.begin(), segment.end(), initFrom, 1),
+					std::sregex_token_iterator(),
+					&model.textureLocation);
+
+				model.hasTexture = true;
+				model.textureLocation = "media/" + model.textureLocation;
+				segment.clear();
+			}
+
+			if (line._Equal("<library_geometries>")) {
+				libraryGeo = true;
+			}
+
+			if (libraryGeo) {
+				segment += line;
+				std::cout << "new line" << std::endl
+			}
+
+			if (line._Equal("</library_geometries>")) {
+				libraryGeo = false;
+				//std::cout << segment;
+
+				std::regex source(R"(<source id=\"([\s\S]*?)\")", std::regex::icase);
+				std::regex floatArr(R"(<float_array id=\"[\s\S]*?\" count=\"[\s\S]*?\">([\s\S]*?)<\/float_array>)", std::regex::icase);
+
+				std::sregex_iterator sourceIter(segment.begin(), segment.end(), source);
+				std::sregex_iterator fArrIter(segment.begin(), segment.end(), floatArr);
+
+				std::sregex_iterator end;
+
+				while (sourceIter != end) {
+				
+				std::string id = (*sourceIter)[1];
+
+				std::istringstream iss((*fArrIter)[1]);
+				std::vector<std::string> tokens{ std::istream_iterator<std::string>{iss},
+				  std::istream_iterator<std::string>{} };
+
+				if (id.find("positions") != std::string::npos) {
+					for (int i = 0; i < tokens.size(); i+=3) {
+						glm::vec3 pos = glm::vec3(std::stof(tokens[i]), std::stof(tokens[i + 1]), std::stof(tokens[i + 2]));
+						tempVertices.push_back(pos);
+					}	
+				}
+				else if (id.find("normals") != std::string::npos) {
+					for (int i = 0; i < tokens.size(); i += 3) {
+						glm::vec3 normal = glm::vec3(std::stof(tokens[i]), std::stof(tokens[i + 1]), std::stof(tokens[i + 2]));
+						tempNormals.push_back(normal);
+					}
+				}
+				else if (id.find("map") != std::string::npos) {
+					for (int i = 0; i < tokens.size(); i += 2) {
+						glm::vec2 text = glm::vec2(std::stof(tokens[i]), std::stof(tokens[i + 1]));
+						tempTextures.push_back(text);
+					}
+				}
+
+				sourceIter++;
+				fArrIter++;
+				}
+
+				std::regex semantic(R"(semantic=\"([\s\S]*?)\")", std::regex::icase);
+				std::regex offset(R"(offset=\"([\s\S]*?)\")", std::regex::icase);
+
+				std::sregex_iterator semanticIter(segment.begin(), segment.end(), semantic);
+				std::sregex_iterator offsetIter(segment.begin(), segment.end(), offset);
+
+				int vertOff = -1;
+				int normalOff = -1;
+				int textOff = -1;
+
+				while (semanticIter != end) {
+
+					std::string index = (*semanticIter)[1];
+
+					if (index._Equal("VERTEX")) {
+						vertOff = std::stoi((*offsetIter)[1]);
+						std::cout << "Setting vertex offset to: " << vertOff << std::endl;
+					}
+					else if (index._Equal("NORMAL")) {
+						normalOff = std::stoi((*offsetIter)[1]);
+						std::cout << "Setting normal offset to: " << normalOff << std::endl;
+					}
+					else if (index._Equal("TEXCOORD")) {
+						textOff = std::stoi((*offsetIter)[1]);
+						std::cout << "Setting text offset to: " << textOff << std::endl;
+					}
+					else if (index._Equal("POSITION")) {
+						semanticIter++;
+						continue;
+					}
+
+					semanticIter++;
+					offsetIter++;
+				}
+
+				std::regex points(R"(<p>([\s\S]*?)<\/p>)", std::regex::icase);
+				std::sregex_iterator pointIter(segment.begin(), segment.end(), points);
+
+				while (pointIter != end) {
+					std::istringstream iss((*pointIter)[1]);
+					std::vector<std::string> tokens{ std::istream_iterator<std::string>{iss},
+					  std::istream_iterator<std::string>{} };
+
+					for (int i = 0; i < tokens.size(); i += 3) {
+						
+						if (vertOff >= 0) {
+							vertexIndices.push_back(std::stoi(tokens[i + vertOff]));
+						}
+
+						if (textOff >= 0) {
+							textureIndices.push_back(std::stoi(tokens[i + textOff]));
+						}
+
+						if (normalOff >= 0) {
+							normalIndices.push_back(std::stoi(tokens[i + normalOff]));
+						}
+					}
+
+					pointIter++;
+					
+				}
+			}
+		}
+	}
+
+	rfile.close();
+
+	for (int i = 0; i < vertexIndices.size(); i++) {
+		int vertexIndex = vertexIndices[i];
+		glm::vec3 vertex = tempVertices[vertexIndex];
+		model.vertices.push_back(vertex);
+	}
+
+	for (int i = 0; i < textureIndices.size(); i++) {
+		model.textures.push_back(tempTextures[textureIndices[i]]);
+	}
+
+	for (int i = 0; i < normalIndices.size(); i++) {
+		model.normals.push_back(tempNormals[normalIndices[i]]);
+	}
+
+	for (int i = 0; i < model.vertices.size(); i += 3) {
+		model.vertexIndices.push_back(i + 0);
+		model.vertexIndices.push_back(i + 1);
+		model.vertexIndices.push_back(i + 2);
+	}
+
+	if (model.vertices.size() == 0) {
+		model.createdSuccessfully = false;
+	}
+	else {
+		model.createdSuccessfully = true;
+	}
+
+	return model;
+
+}
+
 
 Model loadFromFile(std::string file) {
 
@@ -203,6 +421,9 @@ Model loadFromFile(std::string file) {
 
 	if (fileType._Equal(".obj")) {
 		newModel = loadFromObj(file);
+	}
+	else if (fileType._Equal(".dae")) {
+		newModel = loadFromDae(file);
 	}
 	else {
 		std::cout << "Sorry this file type is not supported" << std::endl;

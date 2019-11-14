@@ -23,8 +23,6 @@ void Model::init() {
 		{ GL_NONE, NULL }
 	};
 
-
-
 	usedProgram = LoadShaders(shaders);
 	glUseProgram(usedProgram);
 
