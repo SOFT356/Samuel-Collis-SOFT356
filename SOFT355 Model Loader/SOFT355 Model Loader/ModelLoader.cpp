@@ -4,7 +4,7 @@
 #include <string>
 #include <regex>
 #include <sstream>
-
+#include <map>
 
 Model loadFromObj(std::string file) {
 
@@ -14,21 +14,67 @@ Model loadFromObj(std::string file) {
 	//Log to the output that we're making the specified object
 	std::cout << "Creating from: " + file << std::endl;
 
-	//Create a file input stream
-	std::ifstream rfile;
-	rfile.open(file);
-
 	//Instantiate a variable to hold each line of the string
 	std::string line;
 
 	//Create out variables to hold the parsed data untill the end
-	std::vector<GLuint> vertexIndices, textureIndices, normalIndices, faceSize;
+	std::vector<GLuint> vertexIndices, textureIndices, normalIndices, faceSize, materialUsed;
 	std::vector<glm::vec3> tempVertices;
 	std::vector<glm::vec2> tempTextures;
 	std::vector<glm::vec3> tempNormals;
 
+	std::vector<Material> materials;
+
+	int indexOfCurrentMat;
+	Material tempMat; 
+
 	//Create a string to hold the first two characters of each line just so we aren't making a method call each if check
 	std::string lineStart;
+
+	//Create a file input stream
+	std::ifstream rfile;
+
+	//Look for a material file
+	std::string mataerialFile = file.substr(0, file.length() - 3) + "mtl";
+
+	//We want to process the material file first to grab colours and such
+	rfile.open(mataerialFile);
+
+	//if the file is not open then there is no material file for the object
+	if (rfile.is_open()) {
+		while (std::getline(rfile, line)) {
+			lineStart = line.substr(0, 6);
+			if (lineStart._Equal("map_Kd")) {
+				model.textureLocation = line.substr(line.find_first_of(" ") + 1, line.length());
+				//we want to store the texture location in the same format that the user inputted the info in
+				//this means that we will use the same file delimiter. This is done as windows and unix systems
+				//use a different directional slash to indicate folder structure
+				char fileDelimiter = file.find("\\") != std::string::npos ? '\\' : '/';
+				model.textureLocation = file.substr(0, file.find_last_of(fileDelimiter) + 1) + model.textureLocation;
+				model.hasTexture = true;
+			}
+			else if (lineStart._Equal("newmtl")) {
+				tempMat.name = line.substr(7, line.size());
+			}
+			else if (lineStart.substr(0,2)._Equal("Kd")) {
+				glm::vec4 colour;
+				sscanf_s(line.c_str(), "Kd %f %f %f\n", &colour.w, &colour.x, &colour.y);
+				colour.z = 1;
+				tempMat.colour = colour;
+				materials.push_back(tempMat);
+
+			}
+		}
+
+	}
+
+	for (int i = 0; i < materials.size(); i++) {
+		std::cout << materials[i].name << " : " << materials[i].colour.w << " " << materials[i].colour.x << " " << materials[i].colour.y  << " " << materials[i].colour.z << std::endl;
+	}
+
+	rfile.close();
+
+	rfile.open(file);
 
 	//While the file is open and has more contents 
 	if (rfile.is_open()) {
@@ -52,6 +98,18 @@ Model loadFromObj(std::string file) {
 				glm::vec3 normal;
 				sscanf_s(line.c_str(), "vn %f %f %f\n", &normal.x, &normal.y, &normal.z);
 				tempNormals.push_back(normal);
+			}
+			else if (lineStart._Equal("us")) {
+				std::string materialName = line.substr(7, line.size());
+
+
+				for (int i = 0; i < materials.size(); i++) {
+					if (materials[i].name._Equal(materialName)) {
+						indexOfCurrentMat = i;
+						break;
+					}
+				}
+
 			}
 			//f indicates a face
 			else if (lineStart._Equal("f ")) {
@@ -101,6 +159,8 @@ Model loadFromObj(std::string file) {
 					faceSize.push_back(3);
 				}
 
+				materialUsed.push_back(indexOfCurrentMat);
+
 			}
 
 		}
@@ -147,33 +207,22 @@ Model loadFromObj(std::string file) {
 
 	}
 
-	rfile.close();
+	for (int i = 0; i < faceSize.size(); i++) {
+		switch (faceSize[i]) {
+		case 4: 
+			model.colours.push_back(materials[materialUsed[i]].colour);
+		default:
+			model.colours.push_back(materials[materialUsed[i]].colour);
+			model.colours.push_back(materials[materialUsed[i]].colour);
+			model.colours.push_back(materials[materialUsed[i]].colour);
+			break;
 
-	//Look for a material file
-	file = file.substr(0, file.length() - 3) + "mtl";
-
-	rfile.open(file);
-
-	//if the file is not open then there is no material file for the object
-	if (rfile.is_open()) {
-		while (std::getline(rfile, line)) {
-			lineStart = line.substr(0, 6);
-			if (lineStart._Equal("map_Kd")) {
-				model.textureLocation = line.substr(line.find_first_of(" ") + 1, line.length());
-				//we want to store the texture location in the same format that the user inputted the info in
-				//this means that we will use the same file delimiter. This is done as windows and unix systems
-				//use a different directional slash to indicate folder structure
-				char fileDelimiter = file.find("\\") != std::string::npos ? '\\' : '/';
-				model.textureLocation = file.substr(0, file.find_last_of(fileDelimiter) + 1) + model.textureLocation;
-				model.hasTexture = true;
-			}
 		}
-
 	}
 
 	rfile.close();
 
-	//Performing a swap with an empty vector will free up the memory used
+	//Performing a swap with an empty vector should free up the memory used
 	std::vector<glm::vec3>().swap(tempVertices);
 	std::vector<glm::vec3>().swap(tempNormals);
 	std::vector<glm::vec2>().swap(tempTextures);
@@ -232,8 +281,6 @@ Model loadFromDae(std::string file) {
 				line = line.substr(startpos);
 			}
 			
-			//std::cout << line << std::endl;
-			
 			if (line._Equal("<library_images>")) {
 				libraryImg = true;
 				
@@ -248,7 +295,7 @@ Model loadFromDae(std::string file) {
 
 				size_t start = segment.find("<init_from>");
 
-				std::regex initFrom(R"(<init_from>([\s\S]*?)<\/init_from>)", std::regex::icase);
+				std::regex initFrom(R"(<init_from>(.*?)<\/init_from>)", std::regex::icase);
 				std::copy(std::sregex_token_iterator(segment.begin(), segment.end(), initFrom, 1),
 					std::sregex_token_iterator(),
 					&model.textureLocation);
@@ -264,15 +311,14 @@ Model loadFromDae(std::string file) {
 
 			if (libraryGeo) {
 				segment += line;
-				std::cout << "new line" << std::endl
 			}
 
 			if (line._Equal("</library_geometries>")) {
 				libraryGeo = false;
 				//std::cout << segment;
 
-				std::regex source(R"(<source id=\"([\s\S]*?)\")", std::regex::icase);
-				std::regex floatArr(R"(<float_array id=\"[\s\S]*?\" count=\"[\s\S]*?\">([\s\S]*?)<\/float_array>)", std::regex::icase);
+				std::regex source(R"(<source id=\"(.*?)\")", std::regex::icase);
+				std::regex floatArr(R"(<float_array id=\".*?\" count=\".*?\">(.*?)<\/float_array>)", std::regex::icase);
 
 				std::sregex_iterator sourceIter(segment.begin(), segment.end(), source);
 				std::sregex_iterator fArrIter(segment.begin(), segment.end(), floatArr);
@@ -310,8 +356,8 @@ Model loadFromDae(std::string file) {
 				fArrIter++;
 				}
 
-				std::regex semantic(R"(semantic=\"([\s\S]*?)\")", std::regex::icase);
-				std::regex offset(R"(offset=\"([\s\S]*?)\")", std::regex::icase);
+				std::regex semantic(R"(semantic=\"(.*?)\")", std::regex::icase);
+				std::regex offset(R"(offset=\"(.*?)\")", std::regex::icase);
 
 				std::sregex_iterator semanticIter(segment.begin(), segment.end(), semantic);
 				std::sregex_iterator offsetIter(segment.begin(), segment.end(), offset);
@@ -345,7 +391,7 @@ Model loadFromDae(std::string file) {
 					offsetIter++;
 				}
 
-				std::regex points(R"(<p>([\s\S]*?)<\/p>)", std::regex::icase);
+				std::regex points(R"(<p>(.*?)<\/p>)", std::regex::icase);
 				std::sregex_iterator pointIter(segment.begin(), segment.end(), points);
 
 				while (pointIter != end) {

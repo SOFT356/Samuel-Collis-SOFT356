@@ -7,6 +7,14 @@
 #include <vector>
 #include <iostream>
 
+class Material {
+public: 
+	std::string name;
+	glm::vec4 colour;
+};
+
+
+
 class Model
 {
 
@@ -15,6 +23,8 @@ public:
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> textures;
 	std::vector<glm::vec3> normals;
+	std::vector<glm::vec4> colours;
+
 
 	//Indice info
 	std::vector<GLuint> vertexIndices;
@@ -37,7 +47,7 @@ public:
 	bool createdSuccessfully = false;
 
 	enum VAO_IDs { ModelVAO, NumVAOs = 1 };
-	enum Buffer_IDs { Vertices, Normals, Textures, VertexIndices, NumBuffers = 5 };
+	enum Buffer_IDs { Vertices, Colours, Normals, Textures, VertexIndices, NumBuffers = 5 };
 
 	GLuint VAOs[NumVAOs];
 	GLuint Buffers[NumBuffers];

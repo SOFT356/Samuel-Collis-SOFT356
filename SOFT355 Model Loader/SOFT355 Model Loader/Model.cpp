@@ -18,8 +18,8 @@ void Model::init() {
 
 	ShaderInfo  shaders[] =
 	{
-		{ GL_VERTEX_SHADER, "media/triangles.vert" },
-		{ GL_FRAGMENT_SHADER, "media/triangles.frag" },
+		{ GL_VERTEX_SHADER, "media/textured.vert" },
+		{ GL_FRAGMENT_SHADER, "media/textured.frag" },
 		{ GL_NONE, NULL }
 	};
 
@@ -42,6 +42,17 @@ void Model::init() {
 	glVertexAttribPointer(Vertices, 3, GL_FLOAT,
 		GL_FALSE, 0, BUFFER_OFFSET(0));
 
+	glEnableVertexAttribArray(Vertices);
+
+	//Colour Binding
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Colours]);
+	glBufferStorage(GL_ARRAY_BUFFER, colours.size() * sizeof(glm::vec4), colours.data(), 0);
+
+	glVertexAttribPointer(Colours, 4, GL_FLOAT,
+		GL_FALSE, 0, BUFFER_OFFSET(0));
+
+	glEnableVertexAttribArray(Colours);
+
 
 	//Do the same for normals
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Normals]);
@@ -50,12 +61,16 @@ void Model::init() {
 	glVertexAttribPointer(Normals, 3, GL_FLOAT,
 		GL_FALSE, 0, BUFFER_OFFSET(0));
 
+	glEnableVertexAttribArray(Normals);
+
 	//And for textures
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Textures]);
 	glBufferData(GL_ARRAY_BUFFER, textures.size() * sizeof(glm::vec2), textures.data(), GL_STATIC_DRAW);
 
 	glVertexAttribPointer(Textures, 2, GL_FLOAT,
 		GL_FALSE, 0, BUFFER_OFFSET(0));
+
+	glEnableVertexAttribArray(Textures);
 
 	//IF we have determined there's a texture we want to bind it
 	if (hasTexture) {
@@ -64,10 +79,6 @@ void Model::init() {
 
 	//Apply lighting
 	applyLighting();
-
-	glEnableVertexAttribArray(Vertices);
-	glEnableVertexAttribArray(Textures);
-	glEnableVertexAttribArray(Normals);
 
 }
 
