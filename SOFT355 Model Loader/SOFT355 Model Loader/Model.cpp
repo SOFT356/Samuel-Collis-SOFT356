@@ -16,14 +16,28 @@
 
 void Model::init() {
 
-	ShaderInfo  shaders[] =
-	{
-		{ GL_VERTEX_SHADER, "media/textured.vert" },
-		{ GL_FRAGMENT_SHADER, "media/textured.frag" },
-		{ GL_NONE, NULL }
-	};
+	std::vector<ShaderInfo> shaders;
 
-	usedProgram = LoadShaders(shaders);
+
+	shaders.push_back({ GL_VERTEX_SHADER, "media/textured.vert" });
+	shaders.push_back({ GL_FRAGMENT_SHADER, "media/textured.frag" });
+
+	//These two checks are done, as dae parsing may result in some values not being present
+	//to still be able to render these, we shall add some in to still be able to render it
+	if (colours.size() == 0) {
+		for (int i = 0; i < vertices.size(); i++) {
+			colours.push_back(glm::vec4(1,1,1,1));
+		}
+	}
+	if (textures.size() == 0) {
+		for (int i = 0; i < vertices.size(); i++) {
+			textures.push_back(glm::vec2(0, 0));
+		}
+	}
+
+	shaders.push_back({ GL_NONE, NULL });
+
+	usedProgram = LoadShaders(shaders.data());
 	glUseProgram(usedProgram);
 
 	glGenVertexArrays(NumVAOs, VAOs);
@@ -44,6 +58,7 @@ void Model::init() {
 
 	glEnableVertexAttribArray(Vertices);
 
+
 	//Colour Binding
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Colours]);
 	glBufferStorage(GL_ARRAY_BUFFER, colours.size() * sizeof(glm::vec4), colours.data(), 0);
@@ -52,7 +67,6 @@ void Model::init() {
 		GL_FALSE, 0, BUFFER_OFFSET(0));
 
 	glEnableVertexAttribArray(Colours);
-
 
 	//Do the same for normals
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Normals]);
@@ -72,21 +86,22 @@ void Model::init() {
 
 	glEnableVertexAttribArray(Textures);
 
+
 	//IF we have determined there's a texture we want to bind it
 	if (hasTexture) {
 		bindTexture();
 	}
+	else {
+		glUniform1i(glGetUniformLocation(usedProgram, "textured"), 0);
+	}
 
+	
 	//Apply lighting
 	applyLighting();
 
 }
 
 void Model::draw() {
-
-
-	//Only render faces we can see
-	glEnable(GL_CULL_FACE);
 
 	//Create a model matrix
 	glm::mat4 model = glm::mat4(1.0f);
@@ -188,6 +203,7 @@ void Model::debug(bool verbose) {
 	std::cout << "Vertex Count: " << vertices.size() << std::endl;
 	std::cout << "Texture Count: " << textures.size() << std::endl;
 	std::cout << "Normal Count: " << normals.size() << std::endl;
+	std::cout << "Colour count:" << colours.size() << std::endl;
 	std::cout << "Index Count: " << vertexIndices.size() << std::endl;
 
 	if (verbose) {
@@ -228,7 +244,7 @@ void Model::applyLighting() {
 	glUniform4fv(aLoc, 1, glm::value_ptr(ambient));
 
 	//Create the light object and apply to shader
-	glm::vec3 lightPos = glm::vec3(0.0f, 5.0f, 0.0f);
+	glm::vec3 lightPos = glm::vec3(5.0f, 0.0f, 0.0f);
 	GLuint dLightPosLoc = glGetUniformLocation(usedProgram, "lightPos");
 	glUniform3fv(dLightPosLoc, 1, glm::value_ptr(lightPos));
 
@@ -248,6 +264,8 @@ void Model::applyLighting() {
 
 //bind a texture
 void Model::bindTexture() {
+
+	glUniform1i(glGetUniformLocation(usedProgram, "textured"), 1);
 
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);

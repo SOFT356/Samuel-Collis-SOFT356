@@ -58,18 +58,13 @@ Model loadFromObj(std::string file) {
 			}
 			else if (lineStart.substr(0,2)._Equal("Kd")) {
 				glm::vec4 colour;
-				sscanf_s(line.c_str(), "Kd %f %f %f\n", &colour.w, &colour.x, &colour.y);
-				colour.z = 1;
+				sscanf_s(line.c_str(), "Kd %f %f %f\n", &colour.x, &colour.y, &colour.z);
 				tempMat.colour = colour;
 				materials.push_back(tempMat);
 
 			}
 		}
 
-	}
-
-	for (int i = 0; i < materials.size(); i++) {
-		std::cout << materials[i].name << " : " << materials[i].colour.w << " " << materials[i].colour.x << " " << materials[i].colour.y  << " " << materials[i].colour.z << std::endl;
 	}
 
 	rfile.close();
@@ -113,7 +108,7 @@ Model loadFromObj(std::string file) {
 			}
 			//f indicates a face
 			else if (lineStart._Equal("f ")) {
-				unsigned int vertexIndex[4], textureIndex[4], normalIndex[4];
+				int vertexIndex[4], textureIndex[4], normalIndex[4];
 				int matches = sscanf_s(line.c_str(),
 					"f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n",
 					&vertexIndex[0], &textureIndex[0], &normalIndex[0],
@@ -144,22 +139,23 @@ Model loadFromObj(std::string file) {
 				textureIndices.push_back(textureIndex[1] - 1);
 				textureIndices.push_back(textureIndex[2] - 1);
 
-				if (matches == 12) {
+				model.colours.push_back(materials[indexOfCurrentMat].colour);
+				model.colours.push_back(materials[indexOfCurrentMat].colour);
+				model.colours.push_back(materials[indexOfCurrentMat].colour);
 
+				if (matches == 9) {
+					//else we just have a triangle
+					faceSize.push_back(4);
+				}
+				else {
 					//and for triangle 2 we need to add the final vertex of th
 					vertexIndices.push_back(vertexIndex[3] - 1);
 					textureIndices.push_back(textureIndex[3] - 1);
 					normalIndices.push_back(normalIndex[3] - 1);
-
+					model.colours.push_back(materials[indexOfCurrentMat].colour);
 					//if we have 12 matches then we have a quadrilateral
 					faceSize.push_back(4);
 				}
-				else {
-					//else we just have a triangle
-					faceSize.push_back(3);
-				}
-
-				materialUsed.push_back(indexOfCurrentMat);
 
 			}
 
@@ -173,12 +169,9 @@ Model loadFromObj(std::string file) {
 		model.vertices.push_back(vertex);
 	}
 
-
 	for (int i = 0; i < textureIndices.size(); i++) {
-		//same as above but shorthand
 		model.textures.push_back(tempTextures[textureIndices[i]]);
 	}
-	//model.textures = temp_textures;
 
 	for (int i = 0; i < normalIndices.size(); i++) {
 		model.normals.push_back(tempNormals[normalIndices[i]]);
@@ -186,11 +179,11 @@ Model loadFromObj(std::string file) {
 
 
 	int h = 0;
-
 	//We take the value from the facesize and incrament by it to make sure we read
 	//and construct objects correctly that used mixed n-gon faces like the low poly
 	//boat
 	for (int i = 0; i < model.vertices.size(); i += faceSize[h]) {
+
 		model.vertexIndices.push_back(i + 0);
 		model.vertexIndices.push_back(i + 1);
 		model.vertexIndices.push_back(i + 2);
@@ -200,25 +193,14 @@ Model loadFromObj(std::string file) {
 			model.vertexIndices.push_back(i + 3);
 			model.vertexIndices.push_back(i + 0);
 		}
-
+		
 		if (i + faceSize[h] != model.vertices.size()) {
 			h++;
 		}
+		
 
 	}
 
-	for (int i = 0; i < faceSize.size(); i++) {
-		switch (faceSize[i]) {
-		case 4: 
-			model.colours.push_back(materials[materialUsed[i]].colour);
-		default:
-			model.colours.push_back(materials[materialUsed[i]].colour);
-			model.colours.push_back(materials[materialUsed[i]].colour);
-			model.colours.push_back(materials[materialUsed[i]].colour);
-			break;
-
-		}
-	}
 
 	rfile.close();
 
@@ -300,8 +282,12 @@ Model loadFromDae(std::string file) {
 					std::sregex_token_iterator(),
 					&model.textureLocation);
 
-				model.hasTexture = true;
-				model.textureLocation = "media/" + model.textureLocation;
+				//we want to store the texture location in the same format that the user inputted the info in
+				//this means that we will use the same file delimiter. This is done as windows and unix systems
+				//use a different directional slash to indicate folder structure
+				char fileDelimiter = file.find("\\") != std::string::npos ? '\\' : '/';
+				model.textureLocation = file.substr(0, file.find_last_of(fileDelimiter) + 1) + model.textureLocation;
+				model.hasTexture = model.textureLocation.find("notexture.png") == std::string::npos;
 				segment.clear();
 			}
 
@@ -372,17 +358,11 @@ Model loadFromDae(std::string file) {
 
 					if (index._Equal("VERTEX")) {
 						vertOff = std::stoi((*offsetIter)[1]);
-						std::cout << "Setting vertex offset to: " << vertOff << std::endl;
-					}
-					else if (index._Equal("NORMAL")) {
+					} else if (index._Equal("NORMAL")) {
 						normalOff = std::stoi((*offsetIter)[1]);
-						std::cout << "Setting normal offset to: " << normalOff << std::endl;
-					}
-					else if (index._Equal("TEXCOORD")) {
+					} else if (index._Equal("TEXCOORD")) {
 						textOff = std::stoi((*offsetIter)[1]);
-						std::cout << "Setting text offset to: " << textOff << std::endl;
-					}
-					else if (index._Equal("POSITION")) {
+					} else if (index._Equal("POSITION")) {
 						semanticIter++;
 						continue;
 					}
@@ -445,8 +425,7 @@ Model loadFromDae(std::string file) {
 
 	if (model.vertices.size() == 0) {
 		model.createdSuccessfully = false;
-	}
-	else {
+	} else {
 		model.createdSuccessfully = true;
 	}
 

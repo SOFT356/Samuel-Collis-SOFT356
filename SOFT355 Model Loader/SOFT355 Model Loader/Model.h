@@ -13,8 +13,6 @@ public:
 	glm::vec4 colour;
 };
 
-
-
 class Model
 {
 

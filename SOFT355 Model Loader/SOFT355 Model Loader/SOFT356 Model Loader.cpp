@@ -64,6 +64,13 @@ void processKeyEvents(GLFWwindow* window, glm::vec3& rotation, GLfloat& scale) {
 		scale -= scaleIncrament;
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	else {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
 	if (scale < 0) {
 		scale = 0.0000001;
 	}
@@ -145,13 +152,16 @@ int main()
 		
 		for (int i = 0; i < models.size(); i++) {
 			models[i].init();
+			models[i].debug(false);
 		}
 
 		static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 		GLfloat scale = 1.0f;
-
+		
 		std::cout << "You are able to close the window with the Q key" << std::endl;
+		
+		glEnable(GL_DEPTH_TEST);
 		
 		do {
 
@@ -169,8 +179,8 @@ int main()
 			glfwPollEvents();
 
 			glClearBufferfv(GL_COLOR, 0, black);
-			glClearColor(0.2f, 0, 0, 0);
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClearColor(0.0f, 0, 0, 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 		} // Check if the ESC key was pressed or the window was closed
 		while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
