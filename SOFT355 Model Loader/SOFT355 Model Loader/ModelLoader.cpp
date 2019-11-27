@@ -28,6 +28,8 @@ Model loadFromObj(std::string file) {
 	int indexOfCurrentMat;
 	Material tempMat; 
 
+	int countF = 0, countT = 0;
+
 	//Create a string to hold the first two characters of each line just so we aren't making a method call each if check
 	std::string lineStart;
 
@@ -116,6 +118,9 @@ Model loadFromObj(std::string file) {
 					&vertexIndex[2], &textureIndex[2], &normalIndex[2],
 					&vertexIndex[3], &textureIndex[3], &normalIndex[3]);
 
+				if (static_cast<int>(std::count(line.begin(), line.end(), ' ')) * 3 != matches) {
+					continue;
+				}
 
 				//Obj files support n-agons, but in the majority of the time it is either a triangle or a quadrilateral
 				//meaning that we should have either 3x3 or 4x3 of f/f/f per line 
@@ -144,15 +149,16 @@ Model loadFromObj(std::string file) {
 				model.colours.push_back(materials[indexOfCurrentMat].colour);
 
 				if (matches == 9) {
-					//else we just have a triangle
-					faceSize.push_back(4);
+					faceSize.push_back(3);
 				}
 				else {
 					//and for triangle 2 we need to add the final vertex of th
 					vertexIndices.push_back(vertexIndex[3] - 1);
 					textureIndices.push_back(textureIndex[3] - 1);
 					normalIndices.push_back(normalIndex[3] - 1);
+					
 					model.colours.push_back(materials[indexOfCurrentMat].colour);
+				
 					//if we have 12 matches then we have a quadrilateral
 					faceSize.push_back(4);
 				}
