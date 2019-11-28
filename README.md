@@ -2,13 +2,13 @@
 
 This is a project with the focus of loading object files and parsing them to be used with OpenGL. 
 
-##Supported File Formats
+## Supported File Formats
 ```
 .obj - Wavefront's Object file
 .dae - Collada File format
 ```
 
-##Usage
+## Usage
 There is a simple main method that runs through the process of taking user input and a location to place the object. There is a folder called "media" within the project where the files you wish to render should go. A simple dialogue with the main method may look like:
 
 ```
