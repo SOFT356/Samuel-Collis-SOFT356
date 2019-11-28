@@ -1,10 +1,8 @@
 
-#include <iostream>
 #include "GL/glew.h"
 #include "GL/freeglut.h"
 #include "GLFW/glfw3.h"
 #include <glm/glm.hpp> //includes GLM
-#include <iostream>
 #include <string>
 #include "ModelLoader.h"
 #include "ShaderLoader.h"
@@ -14,8 +12,13 @@ GLfloat scaleIncrament = 0.005f;
 
 glm::vec3 cameraLoc = glm::vec3(0.0f, 0.0f, 0.0f);
 
+//Method for dealing with user inputs
 void processKeyEvents(GLFWwindow* window, glm::vec3& rotation, GLfloat& scale) {
 
+	//If wasd is press then rotate the object via the x and y axis
+	//if ijkl is pressed then move the camera
+	//if uo are pressed then change the z axis of the camera
+	//if -+ are pressed change the scale
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
 		cameraLoc.y -= 0.01f;
 	}
@@ -64,6 +67,7 @@ void processKeyEvents(GLFWwindow* window, glm::vec3& rotation, GLfloat& scale) {
 		scale -= scaleIncrament;
 	}
 
+	//If f is held then we want to show wireframe mode
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
@@ -79,11 +83,13 @@ void processKeyEvents(GLFWwindow* window, glm::vec3& rotation, GLfloat& scale) {
 
 int main()
 {
+	Model model;
+
 	//Variable for storing the users input
 	std::string userInput;
 
 	//Temp variables for creation
-	Model model;
+	//Model model;
 	glm::vec3 location;
 
 	//Stores for the models and locations
@@ -142,19 +148,22 @@ int main()
 		
 		} while (true);
 
+		//Initialise glfw
 		glfwInit();
 
 		//Create our window
 		GLFWwindow* window = glfwCreateWindow(800, 600, "Object Loader", NULL, NULL);
 
+		//Initialise glew
 		glfwMakeContextCurrent(window);
 		glewInit();
 		
+		//Initialise every loaded model
 		for (int i = 0; i < models.size(); i++) {
 			models[i].init();
-			models[i].debug(false);
 		}
 
+		//Set up values for rotation and scale
 		static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 		GLfloat scale = 1.0f;
@@ -163,8 +172,10 @@ int main()
 		
 		glEnable(GL_DEPTH_TEST);
 		
+		//main opengl draw loop
 		do {
 
+			//Foreach model we want to rotate/translate/scale/draw it
 			for (int i = 0; i < models.size(); i++) {
 				models[i].translate(modelLocations[i]);
 				models[i].rotate(rotation);
@@ -173,11 +184,13 @@ int main()
 				models[i].draw();
 			}
 
+			//We want to process user inputs
 			processKeyEvents(window, rotation, scale);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 
+			//Then clear ready for next pass
 			glClearBufferfv(GL_COLOR, 0, black);
 			glClearColor(0.0f, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -186,11 +199,12 @@ int main()
 		while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
 			glfwWindowShouldClose(window) == 0);
 
+		//We want to clear up any memory we can
 		for (int i = 0; i < models.size(); i++) {
 			models[i].destroy();
 		}
 
-		//Use this is an attempt to free up memory
+		//Use this to try and free up some memory
 		std::vector<Model>().swap(models);
 		std::vector<glm::vec3>().swap(modelLocations);
 
@@ -201,9 +215,8 @@ int main()
 		std::cout << "Type \"quit\" to exit out of the application, enter anything else to prompted to load another file" << std::endl;
 		std::getline(std::cin, userInput);
 
+	//keep going until the user inputs quit
 	} while (!userInput._Equal("quit"));
-
-	
 
 }
 

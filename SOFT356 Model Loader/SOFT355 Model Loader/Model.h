@@ -35,7 +35,7 @@ public:
 	glm::vec3 cameraLocation;
 
 	//the size of the object
-	GLfloat scaleFactor;
+	GLfloat scaleFactor = 1;
 
 	//Texture info
 	bool hasTexture = false;

@@ -26,6 +26,61 @@ render
 You are able to close the window with the Q key
 ```
 
+## Implimentation and Use
+To use the project you will need to change the configuration of the project to point to a folder containing the glm library that can be found [here](https://glm.g-truc.net/0.9.9/index.html). You will also need to check that the nuget packages have been downloaded. The two this project uses are:
+
+```
+nupengl.core v0.1.0.1
+nupengl.core.redist v0.1.0.1
+```
+
+Then a simple example of using the object loader to load and render a file may look like:
+
+```cpp
+#include "GL/glew.h"
+#include "GL/freeglut.h"
+#include "GLFW/glfw3.h"
+#include <glm/glm.hpp> //includes GLM
+#include <string>
+#include "ModelLoader.h"
+#include "ShaderLoader.h"
+
+int main()
+{
+
+	std::string fileLocation = "media/creeper.obj";
+	Model model = loadFromFile(fileLocation);
+
+	glfwInit();
+
+	//Create our window
+	GLFWwindow* window = glfwCreateWindow(800, 600, "Object Loader", NULL, NULL);
+
+	glfwMakeContextCurrent(window);
+	glewInit();
+
+	model.init();
+	static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+	do {
+
+		model.draw();
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+
+		glClearBufferfv(GL_COLOR, 0, black);
+		glClearColor(0.0f, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	} // Check if the ESC key was pressed or the window was closed
+	while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
+		glfwWindowShouldClose(window) == 0);
+
+}
+```
+However within 'SOFT356 Model Loader.cpp' there is a more hands on demo that can be used as an example.
+
 ## Approach to parsing
 #### Obj
 A simple approach of going line by line for the obj file and looking at the first two letters of each line. 

@@ -25,10 +25,10 @@ Model loadFromObj(std::string file) {
 
 	std::vector<Material> materials;
 
-	int indexOfCurrentMat;
+	GLuint indexOfCurrentMat;
 	Material tempMat; 
 
-	int countF = 0, countT = 0;
+	GLuint countF = 0, countT = 0;
 
 	//Create a string to hold the first two characters of each line just so we aren't making a method call each if check
 	std::string lineStart;
@@ -37,10 +37,10 @@ Model loadFromObj(std::string file) {
 	std::ifstream rfile;
 
 	//Look for a material file
-	std::string mataerialFile = file.substr(0, file.length() - 3) + "mtl";
+	std::string materialFile = file.substr(0, file.length() - 3) + "mtl";
 
 	//We want to process the material file first to grab colours and such
-	rfile.open(mataerialFile);
+	rfile.open(materialFile);
 
 	//if the file is not open then there is no material file for the object
 	if (rfile.is_open()) {

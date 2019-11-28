@@ -73,19 +73,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\scollis\Desktop\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath);E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib</IncludePath>
+    <IncludePath>C:\Users\scollis\Desktop\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath);E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;E:\Samuel-Collis-SOFT356\SOFT356 Model Loader\lib</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\scollis\Desktop\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath);E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;D:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib</IncludePath>
+    <IncludePath>C:\Users\scollis\Desktop\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath);E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;D:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;E:\Samuel-Collis-SOFT356\SOFT356 Model Loader\lib</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath);E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib</IncludePath>
+    <IncludePath>E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath);E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;E:\Samuel-Collis-SOFT356\SOFT356 Model Loader\lib</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath);E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib</IncludePath>
+    <IncludePath>E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;$(IncludePath);E:\Samuel-Collis-SOFT356\SOFT355 Model Loader\lib;E:\Samuel-Collis-SOFT356\SOFT356 Model Loader\lib</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
