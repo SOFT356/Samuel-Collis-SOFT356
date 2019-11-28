@@ -58,7 +58,6 @@ void Model::init() {
 
 	glEnableVertexAttribArray(Vertices);
 
-
 	//Colour Binding
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[Colours]);
 	glBufferStorage(GL_ARRAY_BUFFER, colours.size() * sizeof(glm::vec4), colours.data(), 0);
@@ -92,10 +91,10 @@ void Model::init() {
 		bindTexture();
 	}
 	else {
+		//If this flag is set to 0, we will only use colour within the shader
 		glUniform1i(glGetUniformLocation(usedProgram, "textured"), 0);
 	}
 
-	
 	//Apply lighting
 	applyLighting();
 
@@ -136,6 +135,7 @@ void Model::draw() {
 	//Bind the vertex array
 	glBindVertexArray(VAOs[ModelVAO]);
 
+	//Bind the texture
 	glBindTexture(GL_TEXTURE_2D, textureId);
 
 	//We then draw the object
@@ -183,10 +183,12 @@ void Model::destroy() {
 	std::vector<glm::vec3>().swap(vertices);
 	std::vector<glm::vec3>().swap(normals);
 	std::vector<glm::vec2>().swap(textures);
+	std::vector<glm::vec4>().swap(colours);
 	std::vector<GLuint>().swap(vertexIndices);
 
 }
 
+//Simple debug method that prints out info 
 void Model::debug(bool verbose) {
 
 	std::cout << "Program: " << usedProgram << std::endl;
@@ -238,6 +240,7 @@ void Model::debug(bool verbose) {
 
 //Apply lighting to the model
 void Model::applyLighting() {
+	
 	//Create Ambient lighting and add to shader
 	glm::vec4 ambient = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	GLuint aLoc = glGetUniformLocation(usedProgram, "ambient");
@@ -265,7 +268,7 @@ void Model::applyLighting() {
 //bind a texture
 void Model::bindTexture() {
 
-	glUniform1i(glGetUniformLocation(usedProgram, "textured"), 1);
+	
 
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);
@@ -283,9 +286,13 @@ void Model::bindTexture() {
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
+		//If we have loaded data correctly, then we want to use the texture in the shader
+		glUniform1i(glGetUniformLocation(usedProgram, "textured"), 1);
 	}
 	else {
 		std::cout << "Failed to load texture" << std::endl;
+		//otherwise we will just fallback and use colour
+		glUniform1i(glGetUniformLocation(usedProgram, "textured"), 0);
 	}
 
 	stbi_image_free(data);

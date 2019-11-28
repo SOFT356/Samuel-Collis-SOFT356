@@ -71,6 +71,7 @@ Model loadFromObj(std::string file) {
 
 	rfile.close();
 
+	//now open the obj file
 	rfile.open(file);
 
 	//While the file is open and has more contents 
@@ -98,15 +99,12 @@ Model loadFromObj(std::string file) {
 			}
 			else if (lineStart._Equal("us")) {
 				std::string materialName = line.substr(7, line.size());
-
-
 				for (int i = 0; i < materials.size(); i++) {
 					if (materials[i].name._Equal(materialName)) {
 						indexOfCurrentMat = i;
 						break;
 					}
 				}
-
 			}
 			//f indicates a face
 			else if (lineStart._Equal("f ")) {
@@ -118,6 +116,8 @@ Model loadFromObj(std::string file) {
 					&vertexIndex[2], &textureIndex[2], &normalIndex[2],
 					&vertexIndex[3], &textureIndex[3], &normalIndex[3]);
 
+				//We do a simple check that the number of vertices is equal to the amount we load in,
+				//this prevents anything from being loaded in and dealt with incorrectly
 				if (static_cast<int>(std::count(line.begin(), line.end(), ' ')) * 3 != matches) {
 					continue;
 				}
@@ -144,23 +144,34 @@ Model loadFromObj(std::string file) {
 				textureIndices.push_back(textureIndex[1] - 1);
 				textureIndices.push_back(textureIndex[2] - 1);
 
-				model.colours.push_back(materials[indexOfCurrentMat].colour);
-				model.colours.push_back(materials[indexOfCurrentMat].colour);
-				model.colours.push_back(materials[indexOfCurrentMat].colour);
+				//If we have any materials then we need to add them in,
+				//if we don't then attempting to add one will crash the app
+				if (materials.size() > 0) {
+					model.colours.push_back(materials[indexOfCurrentMat].colour);
+					model.colours.push_back(materials[indexOfCurrentMat].colour);
+					model.colours.push_back(materials[indexOfCurrentMat].colour);
+				}
 
+				
+				//If we have 9 matches then we have a triangle
 				if (matches == 9) {
 					faceSize.push_back(3);
-				}
-				else {
-					//and for triangle 2 we need to add the final vertex of th
+					
+				} 
+				//Else we might have 12 which means it's a square
+				else if (matches == 12) {
+					
+					//If it's a square then we only need to add one addtional vertex as we can work out the rest
 					vertexIndices.push_back(vertexIndex[3] - 1);
 					textureIndices.push_back(textureIndex[3] - 1);
 					normalIndices.push_back(normalIndex[3] - 1);
 					
-					model.colours.push_back(materials[indexOfCurrentMat].colour);
+					if (materials.size() > 0) {
+						model.colours.push_back(materials[indexOfCurrentMat].colour);
+					}
 				
-					//if we have 12 matches then we have a quadrilateral
 					faceSize.push_back(4);
+
 				}
 
 			}
@@ -175,38 +186,35 @@ Model loadFromObj(std::string file) {
 		model.vertices.push_back(vertex);
 	}
 
+	//We do the same for textures
 	for (int i = 0; i < textureIndices.size(); i++) {
 		model.textures.push_back(tempTextures[textureIndices[i]]);
 	}
 
+	//And for normals
 	for (int i = 0; i < normalIndices.size(); i++) {
 		model.normals.push_back(tempNormals[normalIndices[i]]);
 	}
 
+	int count = 0;
 
-	int h = 0;
 	//We take the value from the facesize and incrament by it to make sure we read
-	//and construct objects correctly that used mixed n-gon faces like the low poly
-	//boat
-	for (int i = 0; i < model.vertices.size(); i += faceSize[h]) {
-
-		model.vertexIndices.push_back(i + 0);
-		model.vertexIndices.push_back(i + 1);
-		model.vertexIndices.push_back(i + 2);
-
-		if (faceSize[h] == 4) {
-			model.vertexIndices.push_back(i + 2);
-			model.vertexIndices.push_back(i + 3);
-			model.vertexIndices.push_back(i + 0);
-		}
+	//and construct objects correctly that used mixed n-gon faces like the low poly boat
+	for (int i = 0; i < faceSize.size(); i++) {
 		
-		if (i + faceSize[h] != model.vertices.size()) {
-			h++;
+		model.vertexIndices.push_back(count + 0);
+		model.vertexIndices.push_back(count + 1);
+		model.vertexIndices.push_back(count + 2);
+
+		if (faceSize[i] == 4) {
+			model.vertexIndices.push_back(count + 2);
+			model.vertexIndices.push_back(count + 3);
+			model.vertexIndices.push_back(count + 0);
 		}
-		
+
+		count += faceSize[i];
 
 	}
-
 
 	rfile.close();
 
@@ -217,6 +225,7 @@ Model loadFromObj(std::string file) {
 	std::vector<GLuint>().swap(vertexIndices);
 	std::vector<GLuint>().swap(textureIndices);
 	std::vector<GLuint>().swap(normalIndices);
+	std::vector<Material>().swap(materials);
 
 	//If there are no vertices then we have probably created the object incorrectly
 	if (model.vertices.size() == 0) {
@@ -297,6 +306,7 @@ Model loadFromDae(std::string file) {
 				segment.clear();
 			}
 
+			//Similarly as above we want to look for the library geometries
 			if (line._Equal("<library_geometries>")) {
 				libraryGeo = true;
 			}
@@ -305,10 +315,12 @@ Model loadFromDae(std::string file) {
 				segment += line;
 			}
 
+			//Once the tag closes we can process it
 			if (line._Equal("</library_geometries>")) {
 				libraryGeo = false;
-				//std::cout << segment;
 
+				//We want to look for each source id and it's float array,
+				//we can then use that to popularte the right set of points (vertices, normals etc)
 				std::regex source(R"(<source id=\"(.*?)\")", std::regex::icase);
 				std::regex floatArr(R"(<float_array id=\".*?\" count=\".*?\">(.*?)<\/float_array>)", std::regex::icase);
 
@@ -317,6 +329,7 @@ Model loadFromDae(std::string file) {
 
 				std::sregex_iterator end;
 
+				//we want to iterate over what we've found
 				while (sourceIter != end) {
 				
 				std::string id = (*sourceIter)[1];
@@ -325,6 +338,7 @@ Model loadFromDae(std::string file) {
 				std::vector<std::string> tokens{ std::istream_iterator<std::string>{iss},
 				  std::istream_iterator<std::string>{} };
 
+				//If the id contains a certain string, we know that the Array iterater will contain what we need
 				if (id.find("positions") != std::string::npos) {
 					for (int i = 0; i < tokens.size(); i+=3) {
 						glm::vec3 pos = glm::vec3(std::stof(tokens[i]), std::stof(tokens[i + 1]), std::stof(tokens[i + 2]));
@@ -348,6 +362,8 @@ Model loadFromDae(std::string file) {
 				fArrIter++;
 				}
 
+				//We want to determine what each value in our stride is,
+				//so similarly to above we look for the semantic and then it's value
 				std::regex semantic(R"(semantic=\"(.*?)\")", std::regex::icase);
 				std::regex offset(R"(offset=\"(.*?)\")", std::regex::icase);
 
@@ -369,6 +385,7 @@ Model loadFromDae(std::string file) {
 					} else if (index._Equal("TEXCOORD")) {
 						textOff = std::stoi((*offsetIter)[1]);
 					} else if (index._Equal("POSITION")) {
+						//as there can be a position semantic without an offset, we just skip that one
 						semanticIter++;
 						continue;
 					}
@@ -377,14 +394,17 @@ Model loadFromDae(std::string file) {
 					offsetIter++;
 				}
 
+				//We pull out every point
 				std::regex points(R"(<p>(.*?)<\/p>)", std::regex::icase);
 				std::sregex_iterator pointIter(segment.begin(), segment.end(), points);
 
+				//iterate over all the points
 				while (pointIter != end) {
 					std::istringstream iss((*pointIter)[1]);
 					std::vector<std::string> tokens{ std::istream_iterator<std::string>{iss},
 					  std::istream_iterator<std::string>{} };
 
+					//Then for strides of 3, using each offset we can populate each vertex appropriately
 					for (int i = 0; i < tokens.size(); i += 3) {
 						
 						if (vertOff >= 0) {
@@ -409,6 +429,7 @@ Model loadFromDae(std::string file) {
 
 	rfile.close();
 
+	//Then we just process similarly to how we deal with an OBJ
 	for (int i = 0; i < vertexIndices.size(); i++) {
 		int vertexIndex = vertexIndices[i];
 		glm::vec3 vertex = tempVertices[vertexIndex];
@@ -423,6 +444,7 @@ Model loadFromDae(std::string file) {
 		model.normals.push_back(tempNormals[normalIndices[i]]);
 	}
 
+	//As Collada files only contain triangles, we don't have to worry about converting anything
 	for (int i = 0; i < model.vertices.size(); i += 3) {
 		model.vertexIndices.push_back(i + 0);
 		model.vertexIndices.push_back(i + 1);

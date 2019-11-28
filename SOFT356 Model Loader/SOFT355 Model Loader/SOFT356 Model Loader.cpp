@@ -90,7 +90,7 @@ int main()
 	std::vector<Model> models;
 	std::vector<glm::vec3> modelLocations;
 
-	std::cout << "Please enter a location you would like to place the camera in the form: x y z\nAny non parsable format will reuslt in the camera being placed at 0,0,0" << std::endl;
+	std::cout << "Please enter a location you would like to place the camera in the form: x y z\nAny non parsable format will result in the camera being placed at 0,0,0" << std::endl;
 	std::getline(std::cin, userInput);
 	sscanf_s(userInput.c_str(), "%f %f %f", &cameraLoc.x, &cameraLoc.y, &cameraLoc.z);
 
@@ -190,7 +190,7 @@ int main()
 			models[i].destroy();
 		}
 
-
+		//Use this is an attempt to free up memory
 		std::vector<Model>().swap(models);
 		std::vector<glm::vec3>().swap(modelLocations);
 
