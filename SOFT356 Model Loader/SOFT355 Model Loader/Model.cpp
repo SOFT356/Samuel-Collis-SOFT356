@@ -18,7 +18,6 @@ void Model::init() {
 
 	std::vector<ShaderInfo> shaders;
 
-
 	shaders.push_back({ GL_VERTEX_SHADER, "media/textured.vert" });
 	shaders.push_back({ GL_FRAGMENT_SHADER, "media/textured.frag" });
 

@@ -215,6 +215,7 @@ int main()
 				models[models.size() - 1].destroy();
 				models.pop_back();
 				removeItem = false;
+				std::cout << "Model removed" << std::endl;
 			}
 			
 		} // Check if the ESC key was pressed or the window was closed
