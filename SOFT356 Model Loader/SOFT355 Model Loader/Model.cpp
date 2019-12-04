@@ -90,10 +90,6 @@ void Model::init() {
 	if (hasTexture) {
 		bindTexture();
 	}
-	else {
-		//If this flag is set to 0, we will only use colour within the shader
-		glUniform1i(glGetUniformLocation(usedProgram, "textured"), 0);
-	}
 
 	//Apply lighting
 	applyLighting();
@@ -286,16 +282,12 @@ void Model::bindTexture() {
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
-		//If we have loaded data correctly, then we want to use the texture in the shader
-		glUniform1i(glGetUniformLocation(usedProgram, "textured"), 1);
+		hasTexture = true;
 	}
 	else {
 		std::cout << "Failed to load texture" << std::endl;
-		//otherwise we will just fallback and use colour
-		glUniform1i(glGetUniformLocation(usedProgram, "textured"), 0);
+		hasTexture = false;
 	}
 
 	stbi_image_free(data);
-
-	glUniform1i(glGetUniformLocation(usedProgram, "textureId"), 0);
 }
