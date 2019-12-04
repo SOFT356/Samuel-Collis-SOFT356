@@ -102,6 +102,8 @@ void Model::init() {
 
 void Model::draw() {
 
+	glUniform1i(glGetUniformLocation(usedProgram, "textured"), hasTexture ? 1 : 0);
+	
 	//Create a model matrix
 	glm::mat4 model = glm::mat4(1.0f);
 
@@ -267,8 +269,6 @@ void Model::applyLighting() {
 
 //bind a texture
 void Model::bindTexture() {
-
-	
 
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);

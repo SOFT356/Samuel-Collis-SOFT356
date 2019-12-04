@@ -9,11 +9,19 @@
 
 GLfloat move = 1.0f;
 GLfloat scaleIncrament = 0.005f;
-
 glm::vec3 cameraLoc = glm::vec3(0.0f, 0.0f, 0.0f);
+bool removeItem = false;
+
+//A simple key callback function
+void singleCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+		removeItem = true;
+	}		
+}
 
 //Method for dealing with user inputs
-void processKeyEvents(GLFWwindow* window, glm::vec3& rotation, GLfloat& scale) {
+void processKeyEvents(GLFWwindow* window, glm::vec3& rotation, GLfloat& scale, bool& removeItem) {
 
 	//If wasd is press then rotate the object via the x and y axis
 	//if ijkl is pressed then move the camera
@@ -100,8 +108,9 @@ int main()
 	std::getline(std::cin, userInput);
 	sscanf_s(userInput.c_str(), "%f %f %f", &cameraLoc.x, &cameraLoc.y, &cameraLoc.z);
 
+	//do while for running the entire program
 	do {
-
+		//Do while for loading the objects
 		do {
 
 			std::cout << "Please input the file location of the object or enter \"quit\" to close.\n";
@@ -157,6 +166,13 @@ int main()
 		//Initialise glew
 		glfwMakeContextCurrent(window);
 		glewInit();
+
+		//Assign the key callback function
+		//this function will only be called once for a keypress and release
+		//otherwise we will process a keypress multiple times
+		//which is fine for rotation but for removing would cause several items to be deleted at once
+		glfwSetKeyCallback(window, singleCallback);
+
 		
 		//Initialise every loaded model
 		for (int i = 0; i < models.size(); i++) {
@@ -185,7 +201,7 @@ int main()
 			}
 
 			//We want to process user inputs
-			processKeyEvents(window, rotation, scale);
+			processKeyEvents(window, rotation, scale, removeItem);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -194,6 +210,12 @@ int main()
 			glClearBufferfv(GL_COLOR, 0, black);
 			glClearColor(0.0f, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			if (removeItem && models.size() > 0) {
+				models[models.size() - 1].destroy();
+				models.pop_back();
+				removeItem = false;
+			}
 			
 		} // Check if the ESC key was pressed or the window was closed
 		while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&

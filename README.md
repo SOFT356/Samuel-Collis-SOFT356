@@ -26,6 +26,18 @@ render
 You are able to close the window with the Q key
 ```
 
+## Controls
+
+Within the main method there are several controls that can be used to manipulate the loaded objects. They are:
+
+- W,A,S,D for rotations in the x and y axis
+-  \+,\- for growing and shrinking the models
+- I,J,K,L for camera movement in the x and y axis
+- U,O for camera movement in the z axis
+- R to remove the newest loaded model
+- Hold F to show the model in wireframe view
+
+
 ## Implimentation and Use
 To use the project you will need to change the configuration of the project to point to a folder containing the glm library that can be found [here](https://glm.g-truc.net/0.9.9/index.html). You will also need to check that the nuget packages have been downloaded. The two this project uses are:
 
